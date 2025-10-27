@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
+using MechanicShopAPI.DTOs;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -45,9 +46,18 @@ public class CustomersController : ControllerBase
 
     // POST: api/customers
     [HttpPost]
-    public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
+    public async Task<ActionResult<Customer>> CreateCustomer(CreateCustomerDto dto)
     {
-        customer.CreatedAt = DateTime.UtcNow;
+        var customer = new Customer
+        {
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            Phone = dto.Phone,
+            Address = dto.Address,
+            CreatedAt = DateTime.UtcNow
+        };
+
         _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
 
@@ -56,14 +66,19 @@ public class CustomersController : ControllerBase
 
     // PUT: api/customers/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateCustomer(int id, Customer customer)
+    public async Task<IActionResult> UpdateCustomer(int id, UpdateCustomerDto dto)
     {
-        if (id != customer.Id)
+        var customer = await _context.Customers.FindAsync(id);
+        if (customer == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
-        _context.Entry(customer).State = EntityState.Modified;
+        customer.FirstName = dto.FirstName;
+        customer.LastName = dto.LastName;
+        customer.Email = dto.Email;
+        customer.Phone = dto.Phone;
+        customer.Address = dto.Address;
 
         try
         {

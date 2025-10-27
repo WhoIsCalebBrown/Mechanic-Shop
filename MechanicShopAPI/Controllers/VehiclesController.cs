@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
+using MechanicShopAPI.DTOs;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -56,25 +57,48 @@ public class VehiclesController : ControllerBase
 
     // POST: api/vehicles
     [HttpPost]
-    public async Task<ActionResult<Vehicle>> CreateVehicle(Vehicle vehicle)
+    public async Task<ActionResult<Vehicle>> CreateVehicle(CreateVehicleDto dto)
     {
-        vehicle.CreatedAt = DateTime.UtcNow;
+        var vehicle = new Vehicle
+        {
+            CustomerId = dto.CustomerId,
+            Make = dto.Make,
+            Model = dto.Model,
+            Year = dto.Year,
+            VIN = dto.VIN,
+            LicensePlate = dto.LicensePlate,
+            Color = dto.Color,
+            Mileage = dto.Mileage,
+            CreatedAt = DateTime.UtcNow
+        };
+
         _context.Vehicles.Add(vehicle);
         await _context.SaveChangesAsync();
+
+        // Reload with customer data
+        await _context.Entry(vehicle).Reference(v => v.Customer).LoadAsync();
 
         return CreatedAtAction(nameof(GetVehicle), new { id = vehicle.Id }, vehicle);
     }
 
     // PUT: api/vehicles/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateVehicle(int id, Vehicle vehicle)
+    public async Task<IActionResult> UpdateVehicle(int id, UpdateVehicleDto dto)
     {
-        if (id != vehicle.Id)
+        var vehicle = await _context.Vehicles.FindAsync(id);
+        if (vehicle == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
-        _context.Entry(vehicle).State = EntityState.Modified;
+        vehicle.CustomerId = dto.CustomerId;
+        vehicle.Make = dto.Make;
+        vehicle.Model = dto.Model;
+        vehicle.Year = dto.Year;
+        vehicle.VIN = dto.VIN;
+        vehicle.LicensePlate = dto.LicensePlate;
+        vehicle.Color = dto.Color;
+        vehicle.Mileage = dto.Mileage;
 
         try
         {

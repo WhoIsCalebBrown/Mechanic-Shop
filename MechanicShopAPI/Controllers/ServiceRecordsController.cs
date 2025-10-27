@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
+using MechanicShopAPI.DTOs;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -56,25 +57,50 @@ public class ServiceRecordsController : ControllerBase
 
     // POST: api/servicerecords
     [HttpPost]
-    public async Task<ActionResult<ServiceRecord>> CreateServiceRecord(ServiceRecord serviceRecord)
+    public async Task<ActionResult<ServiceRecord>> CreateServiceRecord(CreateServiceRecordDto dto)
     {
-        serviceRecord.CreatedAt = DateTime.UtcNow;
+        var serviceRecord = new ServiceRecord
+        {
+            VehicleId = dto.VehicleId,
+            ServiceDate = dto.ServiceDate,
+            ServiceType = dto.ServiceType,
+            Description = dto.Description,
+            LaborCost = dto.LaborCost,
+            PartsCost = dto.PartsCost,
+            MileageAtService = dto.MileageAtService,
+            TechnicianName = dto.TechnicianName,
+            Notes = dto.Notes,
+            CreatedAt = DateTime.UtcNow
+        };
+
         _context.ServiceRecords.Add(serviceRecord);
         await _context.SaveChangesAsync();
+
+        // Reload with navigation properties
+        await _context.Entry(serviceRecord).Reference(s => s.Vehicle).LoadAsync();
 
         return CreatedAtAction(nameof(GetServiceRecord), new { id = serviceRecord.Id }, serviceRecord);
     }
 
     // PUT: api/servicerecords/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateServiceRecord(int id, ServiceRecord serviceRecord)
+    public async Task<IActionResult> UpdateServiceRecord(int id, UpdateServiceRecordDto dto)
     {
-        if (id != serviceRecord.Id)
+        var serviceRecord = await _context.ServiceRecords.FindAsync(id);
+        if (serviceRecord == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
-        _context.Entry(serviceRecord).State = EntityState.Modified;
+        serviceRecord.VehicleId = dto.VehicleId;
+        serviceRecord.ServiceDate = dto.ServiceDate;
+        serviceRecord.ServiceType = dto.ServiceType;
+        serviceRecord.Description = dto.Description;
+        serviceRecord.LaborCost = dto.LaborCost;
+        serviceRecord.PartsCost = dto.PartsCost;
+        serviceRecord.MileageAtService = dto.MileageAtService;
+        serviceRecord.TechnicianName = dto.TechnicianName;
+        serviceRecord.Notes = dto.Notes;
 
         try
         {

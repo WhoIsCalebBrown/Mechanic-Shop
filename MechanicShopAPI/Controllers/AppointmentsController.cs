@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
+using MechanicShopAPI.DTOs;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -69,25 +70,52 @@ public class AppointmentsController : ControllerBase
 
     // POST: api/appointments
     [HttpPost]
-    public async Task<ActionResult<Appointment>> CreateAppointment(Appointment appointment)
+    public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentDto dto)
     {
-        appointment.CreatedAt = DateTime.UtcNow;
+        var appointment = new Appointment
+        {
+            CustomerId = dto.CustomerId,
+            VehicleId = dto.VehicleId,
+            ScheduledDate = dto.ScheduledDate,
+            ServiceType = dto.ServiceType,
+            Description = dto.Description,
+            Status = dto.Status,
+            Notes = dto.Notes,
+            CreatedAt = DateTime.UtcNow
+        };
+
         _context.Appointments.Add(appointment);
         await _context.SaveChangesAsync();
+
+        // Reload with navigation properties
+        await _context.Entry(appointment).Reference(a => a.Customer).LoadAsync();
+        await _context.Entry(appointment).Reference(a => a.Vehicle).LoadAsync();
 
         return CreatedAtAction(nameof(GetAppointment), new { id = appointment.Id }, appointment);
     }
 
     // PUT: api/appointments/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAppointment(int id, Appointment appointment)
+    public async Task<IActionResult> UpdateAppointment(int id, UpdateAppointmentDto dto)
     {
-        if (id != appointment.Id)
+        var appointment = await _context.Appointments.FindAsync(id);
+        if (appointment == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
-        _context.Entry(appointment).State = EntityState.Modified;
+        appointment.CustomerId = dto.CustomerId;
+        appointment.VehicleId = dto.VehicleId;
+        appointment.ScheduledDate = dto.ScheduledDate;
+        appointment.ServiceType = dto.ServiceType;
+        appointment.Description = dto.Description;
+        appointment.Status = dto.Status;
+        appointment.Notes = dto.Notes;
+
+        if (dto.Status == AppointmentStatus.Completed && appointment.CompletedAt == null)
+        {
+            appointment.CompletedAt = DateTime.UtcNow;
+        }
 
         try
         {
