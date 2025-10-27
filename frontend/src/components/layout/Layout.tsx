@@ -1,4 +1,7 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useNavigationWithLoading } from '../../App';
+import FullScreenMenu from './FullScreenMenu';
 import './Layout.css';
 
 interface LayoutProps {
@@ -7,43 +10,60 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const { navigateWithLoading } = useNavigationWithLoading();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    e.preventDefault();
+    navigateWithLoading(path);
+  };
 
   return (
     <div className="layout">
       <nav className="navbar">
         <div className="nav-brand">
           <h1>Caleb's Mechanic Shop</h1>
+          <button
+            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
         <ul className="nav-links">
           <li>
-            <Link to="/" className={isActive('/') ? 'active' : ''}>
+            <a href="/" onClick={(e) => handleNavClick(e, '/')} className={isActive('/') ? 'active' : ''}>
               Dashboard
-            </Link>
+            </a>
           </li>
           <li>
-            <Link to="/customers" className={isActive('/customers') ? 'active' : ''}>
+            <a href="/customers" onClick={(e) => handleNavClick(e, '/customers')} className={isActive('/customers') ? 'active' : ''}>
               Customers
-            </Link>
+            </a>
           </li>
           <li>
-            <Link to="/vehicles" className={isActive('/vehicles') ? 'active' : ''}>
+            <a href="/vehicles" onClick={(e) => handleNavClick(e, '/vehicles')} className={isActive('/vehicles') ? 'active' : ''}>
               Vehicles
-            </Link>
+            </a>
           </li>
           <li>
-            <Link to="/appointments" className={isActive('/appointments') ? 'active' : ''}>
+            <a href="/appointments" onClick={(e) => handleNavClick(e, '/appointments')} className={isActive('/appointments') ? 'active' : ''}>
               Appointments
-            </Link>
+            </a>
           </li>
           <li>
-            <Link to="/service-records" className={isActive('/service-records') ? 'active' : ''}>
+            <a href="/service-records" onClick={(e) => handleNavClick(e, '/service-records')} className={isActive('/service-records') ? 'active' : ''}>
               Service Records
-            </Link>
+            </a>
           </li>
         </ul>
       </nav>
+      <FullScreenMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <main className="main-content">
         {children}
       </main>
