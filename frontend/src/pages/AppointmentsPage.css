@@ -1,29 +1,39 @@
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.875rem;
+  padding: 0.375rem 1rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .status-scheduled {
-  background-color: #3498db;
-  color: white;
+  background: var(--audi-red);
+  color: var(--audi-white);
 }
 
 .status-inprogress {
-  background-color: #f39c12;
-  color: white;
+  background: var(--audi-black);
+  color: var(--audi-white);
+  border: 1px solid var(--audi-red);
 }
 
 .status-completed {
-  background-color: #27ae60;
-  color: white;
+  background: var(--audi-dark-gray);
+  color: var(--audi-white);
 }
 
 .status-cancelled {
-  background-color: #95a5a6;
-  color: white;
+  background: var(--audi-gray);
+  color: var(--audi-white);
+}
+
+.status-noshow {
+  background: var(--audi-light-gray);
+  color: var(--audi-dark-gray);
+  border: 1px solid var(--audi-gray);
 }
 
 .customer-header {

@@ -2,44 +2,85 @@
   width: 100%;
 }
 
+.dashboard h1 {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: var(--audi-dark-gray);
+  margin-bottom: 0.5rem;
+}
+
 .welcome {
-  color: #7f8c8d;
+  color: var(--audi-gray);
   margin-top: 0.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
   margin-bottom: 3rem;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(145deg, var(--audi-white) 0%, #fafafa 100%);
+  border-radius: 2px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid var(--audi-red);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: var(--audi-red);
+  opacity: 0.03;
+  border-radius: 50%;
+  transform: translate(40%, -40%);
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  border-left-color: var(--audi-black);
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 70px;
+  height: 70px;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   flex-shrink: 0;
+  background: var(--audi-black);
+  color: var(--audi-white);
+  position: relative;
+}
+
+.stat-icon::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: var(--audi-red);
 }
 
 .stat-content {
@@ -47,35 +88,47 @@
 }
 
 .stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #2c3e50;
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: var(--audi-black);
   line-height: 1;
+  letter-spacing: -1px;
 }
 
 .stat-label {
-  margin-top: 0.5rem;
-  color: #7f8c8d;
-  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  color: var(--audi-gray);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
 }
 
 .upcoming-section {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(145deg, var(--audi-white) 0%, #fafafa 100%);
+  border-radius: 2px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-top: 4px solid var(--audi-red);
 }
 
 .upcoming-section h2 {
   margin-top: 0;
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
+  margin-bottom: 2rem;
+  color: var(--audi-black);
+  font-weight: 300;
+  font-size: 1.8rem;
+  letter-spacing: -0.3px;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .empty-message {
-  color: #7f8c8d;
+  color: var(--audi-gray);
   text-align: center;
-  padding: 2rem;
+  padding: 3rem;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 .appointments-list {
@@ -86,22 +139,46 @@
 
 .appointment-item {
   display: flex;
-  gap: 1.5rem;
-  padding: 1rem;
-  border: 1px solid #ecf0f1;
-  border-radius: 6px;
-  transition: background-color 0.2s;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: var(--audi-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.appointment-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--audi-red);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .appointment-item:hover {
-  background-color: #f8f9fa;
+  background: rgba(245, 5, 56, 0.02);
+  border-color: rgba(245, 5, 56, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateX(4px);
+}
+
+.appointment-item:hover::before {
+  transform: scaleY(1);
 }
 
 .appointment-date {
-  color: #3498db;
-  font-weight: 600;
+  color: var(--audi-red);
+  font-weight: 500;
   min-width: 140px;
   flex-shrink: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
 }
 
 .appointment-details {
@@ -109,27 +186,55 @@
 }
 
 .appointment-service {
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.25rem;
+  font-weight: 500;
+  color: var(--audi-black);
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
 }
 
 .appointment-description {
-  color: #7f8c8d;
+  color: var(--audi-gray);
   font-size: 0.9rem;
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--audi-gray);
+  font-size: 1.2rem;
+  letter-spacing: 1px;
 }
 
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .upcoming-section {
+    padding: 1.5rem;
   }
 
   .appointment-item {
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    padding: 1.25rem;
   }
 
   .appointment-date {
     min-width: auto;
+  }
+
+  .dashboard h1 {
+    font-size: 2rem;
   }
 }
