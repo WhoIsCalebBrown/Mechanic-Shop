@@ -33,12 +33,13 @@
   height: 100%;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease 0.5s;
+  transition: opacity 0.3s ease;
   z-index: 1;
 }
 
 .fullscreen-menu.open .menu-topographic-base {
   opacity: 1;
+  transition: opacity 0.6s ease 0.5s;
 }
 
 .menu-topographic {
@@ -49,24 +50,27 @@
   height: 100%;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.6s ease 0.5s;
+  transition: opacity 0.3s ease;
   z-index: 15; /* Above menu-content (10) but way below menu-close (10000) */
 }
 
 .fullscreen-menu.open .menu-topographic {
   opacity: 1;
   pointer-events: all; /* Enable pointer events when open */
+  transition: opacity 0.6s ease 0.5s;
 }
 
 /* Topography path hover effects */
 .topo-path {
   cursor: pointer;
-  transition: stroke 0.6s ease, opacity 0.6s ease;
+  transition: stroke 1.2s ease, opacity 1.2s ease, filter 1.2s ease;
   stroke-width: 3;
   stroke: rgba(255,255,255,0.2);
   stroke-linecap: round;
   pointer-events: stroke;
   opacity: 1.0;
+  filter: none;
+  will-change: filter, opacity; /* Hint for GPU acceleration */
 }
 
 .topo-path:hover,
@@ -74,7 +78,8 @@
   stroke: rgba(255,255,255,1);
   stroke-width: 4;
   opacity: 1;
-  transition: stroke 0.1s ease, opacity 0.1s ease;
+  filter: url(#pathGlow);
+  transition: stroke 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
 }
 
 /* Ripple circle - animated via SMIL in the SVG */
@@ -142,9 +147,9 @@
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 4rem 6rem;
-  gap: 6rem;
+  gap: 8rem;
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -222,7 +227,7 @@
 .menu-nav {
   position: relative;
   z-index: 10;
-  flex: 1;
+  flex: 0 1 auto;
   display: flex;
   align-items: center;
   pointer-events: none; /* Let mouse events pass through to topography */

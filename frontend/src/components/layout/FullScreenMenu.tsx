@@ -169,16 +169,15 @@ export default function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps)
     // Add glow class
     path.classList.add('topo-path-active');
 
-    // Remove glow after the element has time to fully light up
-    // This needs to be immediate so the fade-out transition can start
+    // Remove glow after the element has time to stay lit
     setTimeout(() => {
       path.classList.remove('topo-path-active');
-    }, 100);
+    }, 400); // Stay lit for 400ms
 
     // Remove from active set after full animation completes (fade out duration)
     setTimeout(() => {
       activePathsRef.current.delete(path);
-    }, 700); // 100ms active + 600ms fade out
+    }, 1600); // 400ms active + 1200ms fade out
 
     const newRipple = { id: Date.now() + Math.random(), x, y };
     setRipples(prev => [...prev, newRipple]);
@@ -210,18 +209,15 @@ export default function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps)
     preserveAspectRatio="xMidYMid slice"
     xmlns="http://www.w3.org/2000/svg">
     <defs>
-      {/* Radial gradient for light effect */}
-      <radialGradient id="mouseLight">
-        <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
-        <stop offset="50%" stopColor="rgba(255,255,255,0.05)" />
-        <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-      </radialGradient>
-
-      {/* Filter for glow effect on hover */}
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      {/* Glow filter for active paths - more performant than drop-shadow */}
+      <filter id="pathGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur1"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur2"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur3"/>
         <feMerge>
-          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="blur3"/>
+          <feMergeNode in="blur2"/>
+          <feMergeNode in="blur1"/>
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
       </filter>
