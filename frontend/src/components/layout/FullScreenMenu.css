@@ -61,20 +61,20 @@
 /* Topography path hover effects */
 .topo-path {
   cursor: pointer;
-  transition: stroke 0.6s ease, stroke-width 0.6s ease, opacity 0.6s ease;
-  stroke-width: 2;
-  stroke: rgba(255,255,255,0.25);
+  transition: stroke 0.6s ease, opacity 0.6s ease;
+  stroke-width: 3;
+  stroke: rgba(255,255,255,0.2);
   stroke-linecap: round;
   pointer-events: stroke;
-  opacity: 0.5;
+  opacity: 1.0;
 }
 
 .topo-path:hover,
 .topo-path-active {
   stroke: rgba(255,255,255,1);
-  stroke-width: 3;
+  stroke-width: 4;
   opacity: 1;
-  transition: stroke 0.1s ease, stroke-width 0.1s ease, opacity 0.1s ease;
+  transition: stroke 0.1s ease, opacity 0.1s ease;
 }
 
 /* Ripple circle - animated via SMIL in the SVG */
@@ -225,6 +225,7 @@
   flex: 1;
   display: flex;
   align-items: center;
+  pointer-events: none; /* Let mouse events pass through to topography */
 }
 
 .menu-links {
@@ -250,6 +251,7 @@
   transform: translateX(-30px);
   transition: opacity 0.2s ease, transform 0.2s ease;
   width: fit-content;
+  pointer-events: all; /* Re-enable pointer events for links */
 }
 
 .fullscreen-menu.open .menu-link {
