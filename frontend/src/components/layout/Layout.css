@@ -132,6 +132,13 @@
   padding: 0;
   z-index: 10000;
   position: relative;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.hamburger.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hamburger span {
@@ -144,25 +151,8 @@
   transform-origin: center;
 }
 
-.hamburger.open span:nth-child(1) {
-  transform: translateY(10px) rotate(45deg);
-}
-
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-  transform: translateX(-20px);
-}
-
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-10px) rotate(-45deg);
-}
-
 .hamburger:hover span {
   background: var(--audi-red);
-}
-
-.hamburger.open:hover span {
-  background: var(--audi-white);
 }
 
 @media (max-width: 768px) {

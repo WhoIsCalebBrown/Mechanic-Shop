@@ -26,7 +26,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="nav-brand">
           <h1>Caleb's Mechanic Shop</h1>
           <button
-            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            className={`hamburger ${menuOpen ? 'hidden' : ''}`}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
