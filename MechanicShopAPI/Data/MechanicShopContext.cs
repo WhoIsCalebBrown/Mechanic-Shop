@@ -14,6 +14,7 @@ public class MechanicShopContext : DbContext
     public DbSet<Vehicle> Vehicles { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
     public DbSet<ServiceRecord> ServiceRecords { get; set; } = null!;
+    public DbSet<SiteSettings> SiteSettings { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,6 +70,15 @@ public class MechanicShopContext : DbContext
                 .WithMany(v => v.ServiceRecords)
                 .HasForeignKey(e => e.VehicleId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure SiteSettings
+        modelBuilder.Entity<SiteSettings>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.BusinessName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(50);
         });
     }
 }

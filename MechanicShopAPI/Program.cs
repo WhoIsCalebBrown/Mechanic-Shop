@@ -35,6 +35,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Automatically apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<MechanicShopContext>();
+    db.Database.EnsureCreated(); // This will create the database and all tables
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

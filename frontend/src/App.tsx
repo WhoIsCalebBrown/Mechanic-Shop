@@ -2,6 +2,8 @@ import { useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import LoadingScreen from './components/LoadingScreen';
+import LandingPage from './pages/LandingPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
 import VehiclesPage from './pages/VehiclesPage';
@@ -10,7 +12,7 @@ import ServiceRecordsPage from './pages/ServiceRecordsPage';
 import './App.css';
 
 interface NavigationContextType {
-  navigateWithLoading: (path: string) => void;
+  navigateWithLoading: (path: string, options?: { skipLoading?: boolean }) => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
@@ -28,11 +30,23 @@ function AppContent() {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const navigateWithLoading = (path: string) => {
+  const navigateWithLoading = (path: string, options?: { skipLoading?: boolean }) => {
     if (path === location.pathname) return;
-    setPendingPath(path);
-    setShowLoading(true);
+
+    // Skip loading if explicitly requested or navigating to landing page
+    const skipLoading = options?.skipLoading || path === '/';
+
+    if (skipLoading) {
+      // Navigate immediately without loading screen
+      navigate(path);
+    } else {
+      // Show loading screen for transitions
+      setPendingPath(path);
+      setShowLoading(true);
+      setIsNavigating(true);
+    }
   };
 
   const handleLoadingEnterComplete = () => {
@@ -40,6 +54,10 @@ function AppContent() {
     if (pendingPath) {
       navigate(pendingPath);
       setPendingPath(null);
+      // Small delay to let the new page start rendering
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 100);
     }
   };
 
@@ -61,29 +79,30 @@ function AppContent() {
           onEnterComplete={handleLoadingEnterComplete}
         />
       )}
-      <Layout>
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/vehicles" element={<VehiclesPage />} />
-          <Route path="/appointments" element={<AppointmentsPage />} />
-          <Route path="/service-records" element={<ServiceRecordsPage />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Public landing page without dashboard layout */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Admin settings page with layout */}
+        <Route path="/admin/settings" element={<Layout><AdminSettingsPage /></Layout>} />
+
+        {/* Staff dashboard routes with layout */}
+        <Route path="/dashboard" element={<Layout><DashboardPage /></Layout>} />
+        <Route path="/customers" element={<Layout><CustomersPage /></Layout>} />
+        <Route path="/vehicles" element={<Layout><VehiclesPage /></Layout>} />
+        <Route path="/appointments" element={<Layout><AppointmentsPage /></Layout>} />
+        <Route path="/service-records" element={<Layout><ServiceRecordsPage /></Layout>} />
+      </Routes>
     </NavigationContext.Provider>
   );
 }
 
 function App() {
-  const [showInitialLoading, setShowInitialLoading] = useState(true);
-
+  // Remove initial loading screen - it's not needed
   return (
-    <>
-      {showInitialLoading && <LoadingScreen onComplete={() => setShowInitialLoading(false)} />}
-      <Router>
-        <AppContent />
-      </Router>
-    </>
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 

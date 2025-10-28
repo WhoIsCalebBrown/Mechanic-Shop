@@ -28,6 +28,7 @@ export default function LoadingScreen({ onComplete, onExitComplete, onEnterCompl
 
     element.addEventListener('animationend', handleAnimationEnd);
 
+    // Reduced timing - only show briefly for smooth transition
     const timer = setTimeout(() => {
       setIsExiting(true);
       // Call onComplete when exit animation starts
@@ -37,8 +38,8 @@ export default function LoadingScreen({ onComplete, onExitComplete, onEnterCompl
         if (onExitComplete) {
           onExitComplete();
         }
-      }, 800); // Wait for exit animation
-    }, 1500); // Show for at least 1.5 seconds
+      }, 600); // Wait for exit animation (reduced from 800ms)
+    }, 800); // Show for 0.8 seconds (reduced from 1.5 seconds)
 
     return () => {
       element.removeEventListener('animationend', handleAnimationEnd);

@@ -17,7 +17,8 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
-    navigateWithLoading(path);
+    // Skip loading screen for regular navbar navigation
+    navigateWithLoading(path, { skipLoading: true });
   };
 
   return (
@@ -25,19 +26,28 @@ export default function Layout({ children }: LayoutProps) {
       <nav className="navbar">
         <div className="nav-brand">
           <h1>Caleb's Mechanic Shop</h1>
-          <button
-            className={`hamburger ${menuOpen ? 'hidden' : ''}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          <div className="nav-brand-actions">
+            <a href="/" className="view-landing-btn" title="View Landing Page">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>Landing Page</span>
+            </a>
+            <button
+              className={`hamburger ${menuOpen ? 'hidden' : ''}`}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
         </div>
         <ul className="nav-links">
           <li>
-            <a href="/" onClick={(e) => handleNavClick(e, '/')} className={isActive('/') ? 'active' : ''}>
+            <a href="/dashboard" onClick={(e) => handleNavClick(e, '/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
               Dashboard
             </a>
           </li>
@@ -61,9 +71,14 @@ export default function Layout({ children }: LayoutProps) {
               Service Records
             </a>
           </li>
+          <li>
+            <a href="/admin/settings" onClick={(e) => handleNavClick(e, '/admin/settings')} className={isActive('/admin/settings') ? 'active' : ''}>
+              Site Settings
+            </a>
+          </li>
         </ul>
       </nav>
-      <FullScreenMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      {menuOpen && <FullScreenMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />}
       <main className="main-content">
         {children}
       </main>
