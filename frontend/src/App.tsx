@@ -27,16 +27,13 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   const navigateWithLoading = (path: string) => {
     if (path === location.pathname) return;
     setShowLoading(true);
-    setPendingPath(path);
     // Wait for loading screen to fully appear before navigating
     setTimeout(() => {
       navigate(path);
-      setPendingPath(null);
     }, 500);
   };
 
