@@ -27,14 +27,20 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
 
   const navigateWithLoading = (path: string) => {
     if (path === location.pathname) return;
+    setPendingPath(path);
     setShowLoading(true);
-    // Wait for loading screen to fully appear before navigating
-    setTimeout(() => {
-      navigate(path);
-    }, 500);
+  };
+
+  const handleLoadingEnterComplete = () => {
+    // Slide-down animation complete, now navigate
+    if (pendingPath) {
+      navigate(pendingPath);
+      setPendingPath(null);
+    }
   };
 
   const handleLoadingComplete = () => {
@@ -52,6 +58,7 @@ function AppContent() {
         <LoadingScreen
           onComplete={handleLoadingComplete}
           onExitComplete={handleLoadingExitComplete}
+          onEnterComplete={handleLoadingEnterComplete}
         />
       )}
       <Layout>

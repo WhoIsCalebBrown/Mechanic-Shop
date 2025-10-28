@@ -135,8 +135,11 @@ export default function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps)
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
-    onClose();
+    // Start loading screen first, close menu after loading screen covers everything
     navigateWithLoading(path);
+    setTimeout(() => {
+      onClose();
+    }, 600); // Wait for loading screen to slide down and cover the menu
   };
 
   const leftColumnTransform = `translateY(${imageOffset.leftY}px)`;

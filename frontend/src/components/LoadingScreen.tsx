@@ -1,15 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import './LoadingScreen.css';
 
 interface LoadingScreenProps {
   onComplete: () => void;
   onExitComplete?: () => void;
+  onEnterComplete?: () => void;
 }
 
-export default function LoadingScreen({ onComplete, onExitComplete }: LoadingScreenProps) {
+export default function LoadingScreen({ onComplete, onExitComplete, onEnterComplete }: LoadingScreenProps) {
   const [isExiting, setIsExiting] = useState(false);
+  const screenRef = useRef<HTMLDivElement>(null);
+  const hasEnteredRef = useRef(false);
 
   useEffect(() => {
+    const element = screenRef.current;
+    if (!element) return;
+
+    // Listen for animation end to know when slide-down completes
+    const handleAnimationEnd = (e: AnimationEvent) => {
+      if (e.animationName === 'slideDown' && !hasEnteredRef.current) {
+        hasEnteredRef.current = true;
+        if (onEnterComplete) {
+          onEnterComplete();
+        }
+      }
+    };
+
+    element.addEventListener('animationend', handleAnimationEnd);
+
     const timer = setTimeout(() => {
       setIsExiting(true);
       // Call onComplete when exit animation starts
@@ -22,11 +40,14 @@ export default function LoadingScreen({ onComplete, onExitComplete }: LoadingScr
       }, 800); // Wait for exit animation
     }, 1500); // Show for at least 1.5 seconds
 
-    return () => clearTimeout(timer);
-  }, [onComplete, onExitComplete]);
+    return () => {
+      element.removeEventListener('animationend', handleAnimationEnd);
+      clearTimeout(timer);
+    };
+  }, [onComplete, onExitComplete, onEnterComplete]);
 
   return (
-    <div className={`loading-screen ${isExiting ? 'exit' : ''}`}>
+    <div ref={screenRef} className={`loading-screen ${isExiting ? 'exit' : ''}`}>
       <div className="loading-content">
         <svg
           className="racing-car"
