@@ -22,6 +22,8 @@ public class MechanicShopContext : DbContext
     public DbSet<Appointment> Appointments { get; set; } = null!;
     public DbSet<ServiceRecord> ServiceRecords { get; set; } = null!;
     public DbSet<SiteSettings> SiteSettings { get; set; } = null!;
+    public DbSet<Staff> Staff { get; set; } = null!;
+    public DbSet<RepairOrder> RepairOrders { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -176,10 +178,15 @@ public class MechanicShopContext : DbContext
                 .WithMany(v => v.Appointments)
                 .HasForeignKey(e => e.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.AssignedStaff)
+                .WithMany(s => s.AssignedAppointments)
+                .HasForeignKey(e => e.AssignedStaffId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => new { e.TenantId, e.ScheduledDate });
             entity.HasIndex(e => new { e.TenantId, e.Status });
+            entity.HasIndex(e => e.AssignedStaffId);
 
             // Global query filter for multi-tenancy
             entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
@@ -204,9 +211,96 @@ public class MechanicShopContext : DbContext
                 .WithMany(v => v.ServiceRecords)
                 .HasForeignKey(e => e.VehicleId)
                 .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.RepairOrder)
+                .WithMany(r => r.ServiceRecords)
+                .HasForeignKey(e => e.RepairOrderId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(e => e.PerformedByStaff)
+                .WithMany()
+                .HasForeignKey(e => e.PerformedByStaffId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasIndex(e => e.TenantId);
             entity.HasIndex(e => new { e.TenantId, e.ServiceDate });
+            entity.HasIndex(e => e.RepairOrderId);
+            entity.HasIndex(e => e.PerformedByStaffId);
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
+        });
+
+        // Configure Staff
+        modelBuilder.Entity<Staff>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Phone).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.Staff)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.Email }).IsUnique();
+            entity.HasIndex(e => new { e.TenantId, e.Role });
+            entity.HasIndex(e => new { e.TenantId, e.Status });
+            entity.HasIndex(e => e.UserId);
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
+        });
+
+        // Configure RepairOrder
+        modelBuilder.Entity<RepairOrder>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OrderNumber).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Description).IsRequired();
+            entity.Property(e => e.EstimatedLaborCost).HasPrecision(10, 2);
+            entity.Property(e => e.EstimatedPartsCost).HasPrecision(10, 2);
+            entity.Property(e => e.ActualLaborCost).HasPrecision(10, 2);
+            entity.Property(e => e.ActualPartsCost).HasPrecision(10, 2);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Ignore(e => e.EstimatedTotalCost);
+            entity.Ignore(e => e.ActualTotalCost);
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.RepairOrders)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Other relationships
+            entity.HasOne(e => e.Vehicle)
+                .WithMany()
+                .HasForeignKey(e => e.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Appointment)
+                .WithMany(a => a.RepairOrders)
+                .HasForeignKey(e => e.AppointmentId)
+                .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(e => e.AssignedTechnician)
+                .WithMany(s => s.AssignedRepairOrders)
+                .HasForeignKey(e => e.AssignedTechnicianId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Indexes
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.OrderNumber }).IsUnique();
+            entity.HasIndex(e => new { e.TenantId, e.Status });
+            entity.HasIndex(e => e.AssignedTechnicianId);
+            entity.HasIndex(e => e.VehicleId);
+            entity.HasIndex(e => e.CustomerId);
 
             // Global query filter for multi-tenancy
             entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);

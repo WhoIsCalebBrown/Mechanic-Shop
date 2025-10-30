@@ -9,6 +9,7 @@ public class Appointment
 
     public int CustomerId { get; set; }
     public int VehicleId { get; set; }
+    public int? AssignedStaffId { get; set; } // Assigned staff member
     public DateTime ScheduledDate { get; set; }
     public string ServiceType { get; set; } = string.Empty;
     public string? Description { get; set; }
@@ -21,6 +22,8 @@ public class Appointment
     public Tenant Tenant { get; set; } = null!;
     public Customer Customer { get; set; } = null!;
     public Vehicle Vehicle { get; set; } = null!;
+    public Staff? AssignedStaff { get; set; }
+    public ICollection<RepairOrder> RepairOrders { get; set; } = new List<RepairOrder>();
 }
 
 public enum AppointmentStatus

@@ -49,6 +49,8 @@ public class Tenant
     public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     public ICollection<ServiceRecord> ServiceRecords { get; set; } = new List<ServiceRecord>();
+    public ICollection<Staff> Staff { get; set; } = new List<Staff>();
+    public ICollection<RepairOrder> RepairOrders { get; set; } = new List<RepairOrder>();
 }
 
 public enum TenantPlan

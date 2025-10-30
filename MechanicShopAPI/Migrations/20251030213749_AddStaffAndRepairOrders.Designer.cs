@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MechanicShopAPI.Migrations
 {
     [DbContext(typeof(MechanicShopContext))]
-    [Migration("20251030211601_AddMultiTenancyInfrastructure")]
-    partial class AddMultiTenancyInfrastructure
+    [Migration("20251030213749_AddStaffAndRepairOrders")]
+    partial class AddStaffAndRepairOrders
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace MechanicShopAPI.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AssignedStaffId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -66,6 +69,8 @@ namespace MechanicShopAPI.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedStaffId");
 
                     b.HasIndex("CustomerId");
 
@@ -129,6 +134,127 @@ namespace MechanicShopAPI.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("MechanicShopAPI.Models.RepairOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("ActualCompletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("ActualLaborCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<decimal?>("ActualLaborHours")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("ActualPartsCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<DateTime?>("ActualStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("AssignedTechnicianId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("CustomerApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("CustomerApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CustomerNotes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CustomerSignature")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EstimatedCompletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("EstimatedLaborCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<decimal?>("EstimatedLaborHours")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("EstimatedPartsCost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<string>("InternalNotes")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("MileageIn")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MileageOut")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ScheduledStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TechnicianNotes")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.HasIndex("AssignedTechnicianId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.HasIndex("TenantId", "OrderNumber")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "Status");
+
+                    b.ToTable("RepairOrders");
+                });
+
             modelBuilder.Entity("MechanicShopAPI.Models.ServiceRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -158,6 +284,12 @@ namespace MechanicShopAPI.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
+                    b.Property<int?>("PerformedByStaffId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RepairOrderId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("ServiceDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -176,6 +308,10 @@ namespace MechanicShopAPI.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PerformedByStaffId");
+
+                    b.HasIndex("RepairOrderId");
 
                     b.HasIndex("TenantId");
 
@@ -461,6 +597,88 @@ namespace MechanicShopAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MechanicShopAPI.Models.Staff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CertificationNumbers")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("HourlyRate")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Specializations")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("TerminationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TenantId", "Email")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "Role");
+
+                    b.HasIndex("TenantId", "Status");
+
+                    b.ToTable("Staff");
+                });
+
             modelBuilder.Entity("MechanicShopAPI.Models.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -690,6 +908,11 @@ namespace MechanicShopAPI.Migrations
 
             modelBuilder.Entity("MechanicShopAPI.Models.Appointment", b =>
                 {
+                    b.HasOne("MechanicShopAPI.Models.Staff", "AssignedStaff")
+                        .WithMany("AssignedAppointments")
+                        .HasForeignKey("AssignedStaffId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("MechanicShopAPI.Models.Customer", "Customer")
                         .WithMany("Appointments")
                         .HasForeignKey("CustomerId")
@@ -707,6 +930,8 @@ namespace MechanicShopAPI.Migrations
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AssignedStaff");
 
                     b.Navigation("Customer");
 
@@ -726,8 +951,59 @@ namespace MechanicShopAPI.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("MechanicShopAPI.Models.RepairOrder", b =>
+                {
+                    b.HasOne("MechanicShopAPI.Models.Appointment", "Appointment")
+                        .WithMany("RepairOrders")
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("MechanicShopAPI.Models.Staff", "AssignedTechnician")
+                        .WithMany("AssignedRepairOrders")
+                        .HasForeignKey("AssignedTechnicianId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("MechanicShopAPI.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("RepairOrders")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MechanicShopAPI.Models.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("AssignedTechnician");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("MechanicShopAPI.Models.ServiceRecord", b =>
                 {
+                    b.HasOne("MechanicShopAPI.Models.Staff", "PerformedByStaff")
+                        .WithMany()
+                        .HasForeignKey("PerformedByStaffId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("MechanicShopAPI.Models.RepairOrder", "RepairOrder")
+                        .WithMany("ServiceRecords")
+                        .HasForeignKey("RepairOrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
                         .WithMany("ServiceRecords")
                         .HasForeignKey("TenantId")
@@ -740,9 +1016,24 @@ namespace MechanicShopAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("PerformedByStaff");
+
+                    b.Navigation("RepairOrder");
+
                     b.Navigation("Tenant");
 
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("MechanicShopAPI.Models.Staff", b =>
+                {
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("Staff")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("MechanicShopAPI.Models.Vehicle", b =>
@@ -764,11 +1055,28 @@ namespace MechanicShopAPI.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("MechanicShopAPI.Models.Appointment", b =>
+                {
+                    b.Navigation("RepairOrders");
+                });
+
             modelBuilder.Entity("MechanicShopAPI.Models.Customer", b =>
                 {
                     b.Navigation("Appointments");
 
                     b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("MechanicShopAPI.Models.RepairOrder", b =>
+                {
+                    b.Navigation("ServiceRecords");
+                });
+
+            modelBuilder.Entity("MechanicShopAPI.Models.Staff", b =>
+                {
+                    b.Navigation("AssignedAppointments");
+
+                    b.Navigation("AssignedRepairOrders");
                 });
 
             modelBuilder.Entity("MechanicShopAPI.Models.Tenant", b =>
@@ -777,7 +1085,11 @@ namespace MechanicShopAPI.Migrations
 
                     b.Navigation("Customers");
 
+                    b.Navigation("RepairOrders");
+
                     b.Navigation("ServiceRecords");
+
+                    b.Navigation("Staff");
 
                     b.Navigation("Vehicles");
                 });
