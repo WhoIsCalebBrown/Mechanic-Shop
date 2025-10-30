@@ -1,8 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
+using MechanicShopAPI.Services;
+using MechanicShopAPI.Middleware;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add multi-tenancy services
+builder.Services.AddScoped<ITenantAccessor, TenantAccessor>();
 
 // Add services to the container.
 builder.Services.AddControllers()
@@ -52,6 +57,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
+
+// Add tenant resolution middleware (before authorization)
+app.UseTenantResolution();
 
 app.UseAuthorization();
 

@@ -3,6 +3,10 @@ namespace MechanicShopAPI.Models;
 public class ServiceRecord
 {
     public int Id { get; set; }
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+
     public int VehicleId { get; set; }
     public DateTime ServiceDate { get; set; }
     public string ServiceType { get; set; } = string.Empty;
@@ -16,5 +20,6 @@ public class ServiceRecord
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation property
+    public Tenant Tenant { get; set; } = null!;
     public Vehicle Vehicle { get; set; } = null!;
 }

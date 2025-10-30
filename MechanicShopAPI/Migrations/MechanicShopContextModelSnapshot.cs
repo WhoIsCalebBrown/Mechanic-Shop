@@ -56,6 +56,9 @@ namespace MechanicShopAPI.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("VehicleId")
                         .HasColumnType("integer");
 
@@ -63,7 +66,13 @@ namespace MechanicShopAPI.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("TenantId");
+
                     b.HasIndex("VehicleId");
+
+                    b.HasIndex("TenantId", "ScheduledDate");
+
+                    b.HasIndex("TenantId", "Status");
 
                     b.ToTable("Appointments");
                 });
@@ -104,9 +113,14 @@ namespace MechanicShopAPI.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Email")
                         .IsUnique();
 
                     b.ToTable("Customers");
@@ -152,12 +166,19 @@ namespace MechanicShopAPI.Migrations
                     b.Property<string>("TechnicianName")
                         .HasColumnType("text");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("VehicleId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId");
+
                     b.HasIndex("VehicleId");
+
+                    b.HasIndex("TenantId", "ServiceDate");
 
                     b.ToTable("ServiceRecords");
                 });
@@ -437,6 +458,180 @@ namespace MechanicShopAPI.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MechanicShopAPI.Models.Tenant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BusinessAddress")
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("IntegrationSettings")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MaxCustomers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxUsers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxVehicles")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MediaStoragePath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Plan")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("StorageLimitBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("StorageUsedBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("SubscriptionEndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("TrialEndsAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Website")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Plan");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("Tenants");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BusinessAddress = "123 Main Street",
+                            City = "Springfield",
+                            Country = "US",
+                            CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "contact@precision-auto.com",
+                            MaxCustomers = 1000,
+                            MaxUsers = 10,
+                            MaxVehicles = 2000,
+                            MediaStoragePath = "/tenants/precision-auto/media",
+                            Name = "Precision Automotive",
+                            Phone = "(555) 123-4567",
+                            Plan = 2,
+                            Slug = "precision-auto",
+                            State = "IL",
+                            Status = 0,
+                            StorageLimitBytes = 5368709120L,
+                            StorageUsedBytes = 0L,
+                            ZipCode = "62701"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BusinessAddress = "456 Industrial Blvd",
+                            City = "Chicago",
+                            Country = "US",
+                            CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "info@acme-motors.com",
+                            MaxCustomers = 500,
+                            MaxUsers = 5,
+                            MaxVehicles = 1000,
+                            MediaStoragePath = "/tenants/acme-motors/media",
+                            Name = "ACME Motors & Repair",
+                            Phone = "(555) 987-6543",
+                            Plan = 1,
+                            Slug = "acme-motors",
+                            State = "IL",
+                            Status = 0,
+                            StorageLimitBytes = 5368709120L,
+                            StorageUsedBytes = 0L,
+                            ZipCode = "60601"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BusinessAddress = "789 Speedway Drive",
+                            City = "Indianapolis",
+                            Country = "US",
+                            CreatedAt = new DateTime(2024, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "service@speedway.com",
+                            MaxCustomers = 10000,
+                            MaxUsers = 50,
+                            MaxVehicles = 20000,
+                            MediaStoragePath = "/tenants/speedway-service/media",
+                            Name = "Speedway Service Center",
+                            Phone = "(555) 555-0123",
+                            Plan = 3,
+                            Slug = "speedway-service",
+                            State = "IN",
+                            Status = 0,
+                            StorageLimitBytes = 5368709120L,
+                            StorageUsedBytes = 0L,
+                            ZipCode = "46204"
+                        });
+                });
+
             modelBuilder.Entity("MechanicShopAPI.Models.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -470,6 +665,9 @@ namespace MechanicShopAPI.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("VIN")
                         .HasColumnType("text");
 
@@ -479,6 +677,10 @@ namespace MechanicShopAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "CustomerId");
 
                     b.ToTable("Vehicles");
                 });
@@ -491,6 +693,12 @@ namespace MechanicShopAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("Appointments")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MechanicShopAPI.Models.Vehicle", "Vehicle")
                         .WithMany("Appointments")
                         .HasForeignKey("VehicleId")
@@ -499,16 +707,37 @@ namespace MechanicShopAPI.Migrations
 
                     b.Navigation("Customer");
 
+                    b.Navigation("Tenant");
+
                     b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("MechanicShopAPI.Models.Customer", b =>
+                {
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("Customers")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("MechanicShopAPI.Models.ServiceRecord", b =>
                 {
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("ServiceRecords")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MechanicShopAPI.Models.Vehicle", "Vehicle")
                         .WithMany("ServiceRecords")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Tenant");
 
                     b.Navigation("Vehicle");
                 });
@@ -521,12 +750,31 @@ namespace MechanicShopAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MechanicShopAPI.Models.Tenant", "Tenant")
+                        .WithMany("Vehicles")
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Tenant");
                 });
 
             modelBuilder.Entity("MechanicShopAPI.Models.Customer", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("Vehicles");
+                });
+
+            modelBuilder.Entity("MechanicShopAPI.Models.Tenant", b =>
+                {
+                    b.Navigation("Appointments");
+
+                    b.Navigation("Customers");
+
+                    b.Navigation("ServiceRecords");
 
                     b.Navigation("Vehicles");
                 });
