@@ -28,7 +28,8 @@ public class MechanicShopContext : DbContext
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Phone).IsRequired().HasMaxLength(20);
-            entity.HasIndex(e => e.Email);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.HasIndex(e => e.Email).IsUnique();
         });
 
         // Configure Vehicle
@@ -79,6 +80,61 @@ public class MechanicShopContext : DbContext
             entity.Property(e => e.BusinessName).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.Phone).HasMaxLength(50);
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Seed default site settings
+            entity.HasData(new SiteSettings
+            {
+                Id = 1,
+                BusinessName = "Precision Automotive",
+                Tagline = "Expert Service for Your Vehicle",
+                Address = "123 Auto Street",
+                City = "City",
+                State = "State",
+                ZipCode = "12345",
+                Phone = "(555) 123-4567",
+                Email = "info@mechanic.com",
+                MondayFridayHours = "8am - 6pm",
+                SaturdayHours = "9am - 4pm",
+                SundayHours = "Closed",
+                VehiclesServiced = 5000,
+                SatisfactionRate = 98,
+                YearsExperience = 25,
+                HeroTitle = "PRECISION\nAUTOMOTIVE\nCARE",
+                HeroSubtitle = "Expert Service for Your Vehicle",
+                PrimaryCtaText = "Schedule Service",
+                SecondaryCtaText = "Our Services",
+                Service1Title = "Routine Maintenance",
+                Service1Description = "Oil changes, filter replacements, fluid checks, and comprehensive inspections to keep your vehicle running smoothly.",
+                Service1Feature1 = "Oil & Filter Change",
+                Service1Feature2 = "Brake Inspection",
+                Service1Feature3 = "Tire Rotation",
+                Service1Feature4 = "Fluid Top-ups",
+                Service2Title = "Diagnostics & Repair",
+                Service2Description = "Advanced diagnostic tools and expert technicians to identify and resolve any mechanical or electrical issues.",
+                Service2Feature1 = "Computer Diagnostics",
+                Service2Feature2 = "Engine Repair",
+                Service2Feature3 = "Transmission Service",
+                Service2Feature4 = "Electrical Systems",
+                Service3Title = "Performance Upgrades",
+                Service3Description = "Enhance your vehicle's performance with professional tuning, upgrades, and custom modifications.",
+                Service3Feature1 = "Engine Tuning",
+                Service3Feature2 = "Suspension Upgrades",
+                Service3Feature3 = "Exhaust Systems",
+                Service3Feature4 = "Brake Upgrades",
+                WhyFeature1Title = "Expert Technicians",
+                WhyFeature1Description = "ASE-certified mechanics with decades of combined experience",
+                WhyFeature2Title = "Quality Parts",
+                WhyFeature2Description = "We use only OEM and premium aftermarket parts",
+                WhyFeature3Title = "Transparent Pricing",
+                WhyFeature3Description = "No hidden fees, detailed estimates before any work begins",
+                WhyFeature4Title = "Warranty Coverage",
+                WhyFeature4Description = "All services backed by our comprehensive warranty",
+                CtaTitle = "Ready to Get Started?",
+                CtaSubtitle = "Schedule your service appointment today",
+                CtaButtonText = "Book Appointment",
+                UpdatedAt = new DateTime(2025, 10, 30, 0, 0, 0, DateTimeKind.Utc)
+            });
         });
     }
 }
