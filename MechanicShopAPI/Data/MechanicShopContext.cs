@@ -1,15 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Models;
+using MechanicShopAPI.Services;
 
 namespace MechanicShopAPI.Data;
 
 public class MechanicShopContext : DbContext
 {
-    public MechanicShopContext(DbContextOptions<MechanicShopContext> options)
+    private readonly ITenantAccessor _tenantAccessor;
+
+    public MechanicShopContext(
+        DbContextOptions<MechanicShopContext> options,
+        ITenantAccessor tenantAccessor)
         : base(options)
     {
+        _tenantAccessor = tenantAccessor;
     }
 
+    public DbSet<Tenant> Tenants { get; set; } = null!;
     public DbSet<Customer> Customers { get; set; } = null!;
     public DbSet<Vehicle> Vehicles { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
@@ -20,6 +27,86 @@ public class MechanicShopContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configure Tenant
+        modelBuilder.Entity<Tenant>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Slug).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Unique index on slug for fast lookups
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Plan);
+
+            // Seed test tenants
+            entity.HasData(
+                new Tenant
+                {
+                    Id = 1,
+                    Slug = "precision-auto",
+                    Name = "Precision Automotive",
+                    BusinessAddress = "123 Main Street",
+                    City = "Springfield",
+                    State = "IL",
+                    ZipCode = "62701",
+                    Country = "US",
+                    Phone = "(555) 123-4567",
+                    Email = "contact@precision-auto.com",
+                    Plan = TenantPlan.Professional,
+                    Status = TenantStatus.Active,
+                    MediaStoragePath = "/tenants/precision-auto/media",
+                    MaxUsers = 10,
+                    MaxCustomers = 1000,
+                    MaxVehicles = 2000,
+                    CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new Tenant
+                {
+                    Id = 2,
+                    Slug = "acme-motors",
+                    Name = "ACME Motors & Repair",
+                    BusinessAddress = "456 Industrial Blvd",
+                    City = "Chicago",
+                    State = "IL",
+                    ZipCode = "60601",
+                    Country = "US",
+                    Phone = "(555) 987-6543",
+                    Email = "info@acme-motors.com",
+                    Plan = TenantPlan.Basic,
+                    Status = TenantStatus.Active,
+                    MediaStoragePath = "/tenants/acme-motors/media",
+                    MaxUsers = 5,
+                    MaxCustomers = 500,
+                    MaxVehicles = 1000,
+                    CreatedAt = new DateTime(2025, 1, 15, 0, 0, 0, DateTimeKind.Utc)
+                },
+                new Tenant
+                {
+                    Id = 3,
+                    Slug = "speedway-service",
+                    Name = "Speedway Service Center",
+                    BusinessAddress = "789 Speedway Drive",
+                    City = "Indianapolis",
+                    State = "IN",
+                    ZipCode = "46204",
+                    Country = "US",
+                    Phone = "(555) 555-0123",
+                    Email = "service@speedway.com",
+                    Plan = TenantPlan.Enterprise,
+                    Status = TenantStatus.Active,
+                    MediaStoragePath = "/tenants/speedway-service/media",
+                    MaxUsers = 50,
+                    MaxCustomers = 10000,
+                    MaxVehicles = 20000,
+                    CreatedAt = new DateTime(2024, 12, 1, 0, 0, 0, DateTimeKind.Utc)
+                }
+            );
+        });
+
         // Configure Customer
         modelBuilder.Entity<Customer>(entity =>
         {
@@ -29,7 +116,19 @@ public class MechanicShopContext : DbContext
             entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Phone).IsRequired().HasMaxLength(20);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.HasIndex(e => e.Email).IsUnique();
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.Customers)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique email per tenant
+            entity.HasIndex(e => new { e.TenantId, e.Email }).IsUnique();
+            entity.HasIndex(e => e.TenantId);
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
         });
 
         // Configure Vehicle
@@ -38,10 +137,23 @@ public class MechanicShopContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Make).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Model).IsRequired().HasMaxLength(50);
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.Vehicles)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(e => e.Customer)
                 .WithMany(c => c.Vehicles)
                 .HasForeignKey(e => e.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.CustomerId });
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
         });
 
         // Configure Appointment
@@ -49,6 +161,13 @@ public class MechanicShopContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.ServiceType).IsRequired().HasMaxLength(100);
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.Appointments)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(e => e.Customer)
                 .WithMany(c => c.Appointments)
                 .HasForeignKey(e => e.CustomerId)
@@ -57,6 +176,13 @@ public class MechanicShopContext : DbContext
                 .WithMany(v => v.Appointments)
                 .HasForeignKey(e => e.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.ScheduledDate });
+            entity.HasIndex(e => new { e.TenantId, e.Status });
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
         });
 
         // Configure ServiceRecord
@@ -67,10 +193,23 @@ public class MechanicShopContext : DbContext
             entity.Property(e => e.LaborCost).HasPrecision(10, 2);
             entity.Property(e => e.PartsCost).HasPrecision(10, 2);
             entity.Ignore(e => e.TotalCost); // Computed property
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.ServiceRecords)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(e => e.Vehicle)
                 .WithMany(v => v.ServiceRecords)
                 .HasForeignKey(e => e.VehicleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.ServiceDate });
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
         });
 
         // Configure SiteSettings

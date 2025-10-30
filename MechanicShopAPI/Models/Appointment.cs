@@ -3,6 +3,10 @@ namespace MechanicShopAPI.Models;
 public class Appointment
 {
     public int Id { get; set; }
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+
     public int CustomerId { get; set; }
     public int VehicleId { get; set; }
     public DateTime ScheduledDate { get; set; }
@@ -14,6 +18,7 @@ public class Appointment
     public DateTime? CompletedAt { get; set; }
 
     // Navigation properties
+    public Tenant Tenant { get; set; } = null!;
     public Customer Customer { get; set; } = null!;
     public Vehicle Vehicle { get; set; } = null!;
 }

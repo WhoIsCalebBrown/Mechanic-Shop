@@ -3,6 +3,10 @@ namespace MechanicShopAPI.Models;
 public class Vehicle
 {
     public int Id { get; set; }
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+
     public int CustomerId { get; set; }
     public string Make { get; set; } = string.Empty;
     public string Model { get; set; } = string.Empty;
@@ -14,6 +18,7 @@ public class Vehicle
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
+    public Tenant Tenant { get; set; } = null!;
     public Customer Customer { get; set; } = null!;
     public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     public ICollection<ServiceRecord> ServiceRecords { get; set; } = new List<ServiceRecord>();

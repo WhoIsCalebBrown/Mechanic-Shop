@@ -30,7 +30,7 @@ function AppContent() {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(false);
   const [pendingPath, setPendingPath] = useState<string | null>(null);
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [, setIsNavigating] = useState(false);
 
   const navigateWithLoading = (path: string, options?: { skipLoading?: boolean }) => {
     if (path === location.pathname) return;
@@ -97,7 +97,7 @@ function AppContent() {
   );
 }
 
-function App() {
+function UseNavigationWithLoading() {
   // Remove initial loading screen - it's not needed
   return (
     <Router>
@@ -106,4 +106,4 @@ function App() {
   );
 }
 
-export default App;
+export default UseNavigationWithLoading;

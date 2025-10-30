@@ -4,32 +4,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace MechanicShopAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPostgreSQLMigration : Migration
+    public partial class AddMultiTenancyInfrastructure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Customers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Customers", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "SiteSettings",
                 columns: table => new
@@ -96,11 +80,75 @@ namespace MechanicShopAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tenants",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Slug = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    BusinessAddress = table.Column<string>(type: "text", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
+                    State = table.Column<string>(type: "text", nullable: true),
+                    ZipCode = table.Column<string>(type: "text", nullable: true),
+                    Country = table.Column<string>(type: "text", nullable: true),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Email = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Website = table.Column<string>(type: "text", nullable: true),
+                    LogoUrl = table.Column<string>(type: "text", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Plan = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    TrialEndsAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SubscriptionEndsAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IntegrationSettings = table.Column<string>(type: "text", nullable: true),
+                    MediaStoragePath = table.Column<string>(type: "text", nullable: true),
+                    StorageUsedBytes = table.Column<long>(type: "bigint", nullable: false),
+                    StorageLimitBytes = table.Column<long>(type: "bigint", nullable: false),
+                    MaxUsers = table.Column<int>(type: "integer", nullable: false),
+                    MaxCustomers = table.Column<int>(type: "integer", nullable: false),
+                    MaxVehicles = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tenants", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TenantId = table.Column<int>(type: "integer", nullable: false),
+                    FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customers_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Vehicles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TenantId = table.Column<int>(type: "integer", nullable: false),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
                     Make = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Model = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
@@ -120,6 +168,12 @@ namespace MechanicShopAPI.Migrations
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -128,6 +182,7 @@ namespace MechanicShopAPI.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TenantId = table.Column<int>(type: "integer", nullable: false),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
                     VehicleId = table.Column<int>(type: "integer", nullable: false),
                     ScheduledDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -148,6 +203,12 @@ namespace MechanicShopAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Appointments_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Appointments_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
@@ -161,6 +222,7 @@ namespace MechanicShopAPI.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TenantId = table.Column<int>(type: "integer", nullable: false),
                     VehicleId = table.Column<int>(type: "integer", nullable: false),
                     ServiceDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ServiceType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
@@ -176,6 +238,12 @@ namespace MechanicShopAPI.Migrations
                 {
                     table.PrimaryKey("PK_ServiceRecords", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_ServiceRecords_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_ServiceRecords_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
@@ -188,10 +256,35 @@ namespace MechanicShopAPI.Migrations
                 columns: new[] { "Id", "Address", "BusinessName", "City", "CtaButtonText", "CtaSubtitle", "CtaTitle", "Email", "HeroImageUrl", "HeroSubtitle", "HeroTitle", "LogoUrl", "MondayFridayHours", "Phone", "PrimaryCtaText", "SatisfactionRate", "SaturdayHours", "SecondaryCtaText", "Service1Description", "Service1Feature1", "Service1Feature2", "Service1Feature3", "Service1Feature4", "Service1ImageUrl", "Service1Title", "Service2Description", "Service2Feature1", "Service2Feature2", "Service2Feature3", "Service2Feature4", "Service2ImageUrl", "Service2Title", "Service3Description", "Service3Feature1", "Service3Feature2", "Service3Feature3", "Service3Feature4", "Service3ImageUrl", "Service3Title", "State", "SundayHours", "Tagline", "UpdatedAt", "VehiclesServiced", "WhyFeature1Description", "WhyFeature1Title", "WhyFeature2Description", "WhyFeature2Title", "WhyFeature3Description", "WhyFeature3Title", "WhyFeature4Description", "WhyFeature4Title", "YearsExperience", "ZipCode" },
                 values: new object[] { 1, "123 Auto Street", "Precision Automotive", "City", "Book Appointment", "Schedule your service appointment today", "Ready to Get Started?", "info@mechanic.com", null, "Expert Service for Your Vehicle", "PRECISION\nAUTOMOTIVE\nCARE", null, "8am - 6pm", "(555) 123-4567", "Schedule Service", 98, "9am - 4pm", "Our Services", "Oil changes, filter replacements, fluid checks, and comprehensive inspections to keep your vehicle running smoothly.", "Oil & Filter Change", "Brake Inspection", "Tire Rotation", "Fluid Top-ups", null, "Routine Maintenance", "Advanced diagnostic tools and expert technicians to identify and resolve any mechanical or electrical issues.", "Computer Diagnostics", "Engine Repair", "Transmission Service", "Electrical Systems", null, "Diagnostics & Repair", "Enhance your vehicle's performance with professional tuning, upgrades, and custom modifications.", "Engine Tuning", "Suspension Upgrades", "Exhaust Systems", "Brake Upgrades", null, "Performance Upgrades", "State", "Closed", "Expert Service for Your Vehicle", new DateTime(2025, 10, 30, 0, 0, 0, 0, DateTimeKind.Utc), 5000, "ASE-certified mechanics with decades of combined experience", "Expert Technicians", "We use only OEM and premium aftermarket parts", "Quality Parts", "No hidden fees, detailed estimates before any work begins", "Transparent Pricing", "All services backed by our comprehensive warranty", "Warranty Coverage", 25, "12345" });
 
+            migrationBuilder.InsertData(
+                table: "Tenants",
+                columns: new[] { "Id", "BusinessAddress", "City", "Country", "CreatedAt", "CreatedBy", "Description", "Email", "IntegrationSettings", "LogoUrl", "MaxCustomers", "MaxUsers", "MaxVehicles", "MediaStoragePath", "Name", "Phone", "Plan", "Slug", "State", "Status", "StorageLimitBytes", "StorageUsedBytes", "SubscriptionEndsAt", "TrialEndsAt", "UpdatedAt", "Website", "ZipCode" },
+                values: new object[,]
+                {
+                    { 1, "123 Main Street", "Springfield", "US", new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "contact@precision-auto.com", null, null, 1000, 10, 2000, "/tenants/precision-auto/media", "Precision Automotive", "(555) 123-4567", 2, "precision-auto", "IL", 0, 5368709120L, 0L, null, null, null, null, "62701" },
+                    { 2, "456 Industrial Blvd", "Chicago", "US", new DateTime(2025, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "info@acme-motors.com", null, null, 500, 5, 1000, "/tenants/acme-motors/media", "ACME Motors & Repair", "(555) 987-6543", 1, "acme-motors", "IL", 0, 5368709120L, 0L, null, null, null, null, "60601" },
+                    { 3, "789 Speedway Drive", "Indianapolis", "US", new DateTime(2024, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, null, "service@speedway.com", null, null, 10000, 50, 20000, "/tenants/speedway-service/media", "Speedway Service Center", "(555) 555-0123", 3, "speedway-service", "IN", 0, 5368709120L, 0L, null, null, null, null, "46204" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_CustomerId",
                 table: "Appointments",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_TenantId",
+                table: "Appointments",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_TenantId_ScheduledDate",
+                table: "Appointments",
+                columns: new[] { "TenantId", "ScheduledDate" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Appointments_TenantId_Status",
+                table: "Appointments",
+                columns: new[] { "TenantId", "Status" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_VehicleId",
@@ -199,10 +292,25 @@ namespace MechanicShopAPI.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Customers_Email",
+                name: "IX_Customers_TenantId",
                 table: "Customers",
-                column: "Email",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_TenantId_Email",
+                table: "Customers",
+                columns: new[] { "TenantId", "Email" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRecords_TenantId",
+                table: "ServiceRecords",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServiceRecords_TenantId_ServiceDate",
+                table: "ServiceRecords",
+                columns: new[] { "TenantId", "ServiceDate" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceRecords_VehicleId",
@@ -210,9 +318,35 @@ namespace MechanicShopAPI.Migrations
                 column: "VehicleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tenants_Plan",
+                table: "Tenants",
+                column: "Plan");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_Slug",
+                table: "Tenants",
+                column: "Slug",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_Status",
+                table: "Tenants",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vehicles_CustomerId",
                 table: "Vehicles",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_TenantId",
+                table: "Vehicles",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_TenantId_CustomerId",
+                table: "Vehicles",
+                columns: new[] { "TenantId", "CustomerId" });
         }
 
         /// <inheritdoc />
@@ -232,6 +366,9 @@ namespace MechanicShopAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Tenants");
         }
     }
 }

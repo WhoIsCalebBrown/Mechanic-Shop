@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigationWithLoading } from '../../App';
+import { useNavigationWithLoading } from '../../UseNavigationWithLoading.tsx';
 import './FullScreenMenu.css';
 
 interface FullScreenMenuProps {
