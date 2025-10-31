@@ -205,6 +205,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Enable static files for the booking preview page
+app.UseStaticFiles();
+
 app.UseCors("AllowReactApp");
 
 // Add rate limiting middleware (before authentication)

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Book Online</title>
+
+    <!-- SEO Meta Tags (will be populated dynamically) -->
+    <meta name="description" id="meta-description" content="">
+    <meta name="keywords" id="meta-keywords" content="">
+    <link rel="canonical" id="canonical-url" href="">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="og-title" content="">
+    <meta property="og:description" id="og-description" content="">
+    <meta property="og:url" id="og-url" content="">
+    <meta property="og:image" id="og-image" content="">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="tw-title" content="">
+    <meta name="twitter:description" id="tw-description" content="">
+    <meta name="twitter:image" id="tw-image" content="">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+            --bg-light: #f9fafb;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
+        header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Main content */
+        main {
+            padding: 2rem 0;
+        }
+
+        .section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .service-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .service-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .service-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .service-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .service-duration {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Hours table */
+        .hours-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .hours-table th,
+        .hours-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hours-table th {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .hours-table td {
+            color: var(--text-light);
+        }
+
+        .status-open {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .status-closed {
+            color: var(--error);
+        }
+
+        /* Calendar */
+        .calendar {
+            margin-top: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.5rem;
+        }
+
+        .calendar-day:hover:not(.day-past):not(.day-closed) {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+
+        .calendar-day.day-today {
+            border-color: var(--primary-color);
+            border-width: 2px;
+        }
+
+        .calendar-day.day-past {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.day-closed {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.has-availability {
+            background-color: #ecfdf5;
+        }
+
+        .day-number {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .day-slots {
+            font-size: 0.75rem;
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .contact-info {
+                width: 100%;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-grid {
+                gap: 0.25rem;
+            }
+
+            .day-number {
+                font-size: 0.75rem;
+            }
+
+            .day-slots {
+                font-size: 0.625rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img id="business-logo" class="logo" src="" alt="Logo" style="display: none;">
+                    <h1 id="business-name">Loading...</h1>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📞</span>
+                        <a id="business-phone" href="">-</a>
+                    </div>
+                    <div class="contact-item">
+                        <span>📍</span>
+                        <span id="business-location">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading booking page...</p>
+            </div>
+
+            <div id="content" style="display: none;">
+                <div class="section">
+                    <h2>About Us</h2>
+                    <p id="business-description" class="description"></p>
+                </div>
+
+                <div class="section">
+                    <h2>Our Services</h2>
+                    <div id="services-grid" class="services-grid"></div>
+                </div>
+
+                <div class="section">
+                    <h2>Business Hours</h2>
+                    <table class="hours-table">
+                        <tbody id="hours-table"></tbody>
+                    </table>
+                </div>
+
+                <div class="section">
+                    <h2>Availability Calendar</h2>
+                    <p class="description">Select a service above and view available dates</p>
+                    <div id="calendar" class="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Get slug from URL or use default
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug') || 'quick-fix-auto';
+        const baseUrl = window.location.origin;
+
+        let selectedService = null;
+        let currentMonth = new Date().getMonth() + 1;
+        let currentYear = new Date().getFullYear();
+
+        async function loadBookingPage() {
+            try {
+                const response = await fetch(`/api/book/${slug}/v2`);
+                if (!response.ok) throw new Error('Failed to load booking page');
+
+                const data = await response.json();
+
+                // Update SEO metadata
+                updateSEO(data.seo);
+
+                // Update business info
+                document.getElementById('business-name').textContent = data.profile.businessName;
+                document.getElementById('business-description').textContent = data.profile.description || data.profile.bio || '';
+                document.getElementById('business-phone').textContent = data.profile.contact.formattedPhone || data.profile.contact.phone;
+                document.getElementById('business-phone').href = `tel:${data.profile.contact.phone}`;
+                document.getElementById('business-location').textContent = data.profile.location.area || data.profile.location.city;
+
+                if (data.profile.logoUrl) {
+                    const logo = document.getElementById('business-logo');
+                    logo.src = data.profile.logoUrl;
+                    logo.style.display = 'block';
+                }
+
+                // Render services
+                renderServices(data.services);
+
+                // Render hours
+                renderHours(data.availability.weeklyHours);
+
+                // Show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading booking page:', error);
+                document.getElementById('loading').innerHTML = '<p style="color: var(--error);">Failed to load booking page. Please try again later.</p>';
+            }
+        }
+
+        function updateSEO(seo) {
+            document.title = seo.title;
+            document.getElementById('page-title').textContent = seo.title;
+            document.getElementById('meta-description').content = seo.description;
+            document.getElementById('meta-keywords').content = seo.keywords;
+            document.getElementById('canonical-url').href = seo.canonicalUrl;
+
+            document.getElementById('og-title').content = seo.openGraph.title;
+            document.getElementById('og-description').content = seo.openGraph.description;
+            document.getElementById('og-url').content = seo.openGraph.url;
+            if (seo.openGraph.image) document.getElementById('og-image').content = seo.openGraph.image;
+
+            document.getElementById('tw-title').content = seo.twitter.title;
+            document.getElementById('tw-description').content = seo.twitter.description;
+            if (seo.twitter.image) document.getElementById('tw-image').content = seo.twitter.image;
+        }
+
+        function renderServices(services) {
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = services.map(service => `
+                <div class="service-card" onclick="selectService(${service.id})">
+                    <div class="service-name">${service.name}</div>
+                    <div class="service-description">${service.description || ''}</div>
+                    <div class="service-details">
+                        <div class="service-price">${service.formattedPrice}</div>
+                        <div class="service-duration">${service.formattedDuration}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderHours(weeklyHours) {
+            const table = document.getElementById('hours-table');
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+            table.innerHTML = days.map(day => {
+                const hours = weeklyHours[day];
+                const statusClass = hours.isOpen ? 'status-open' : 'status-closed';
+                return `
+                    <tr>
+                        <th>${day}</th>
+                        <td class="${statusClass}">${hours.formattedHours}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function selectService(serviceId) {
+            selectedService = serviceId;
+            loadCalendar();
+        }
+
+        async function loadCalendar() {
+            if (!selectedService) return;
+
+            try {
+                const response = await fetch(`/api/book/${slug}/calendar/${currentYear}/${currentMonth}?serviceId=${selectedService}`);
+                if (!response.ok) throw new Error('Failed to load calendar');
+
+                const calendar = await response.json();
+                renderCalendar(calendar);
+
+            } catch (error) {
+                console.error('Error loading calendar:', error);
+            }
+        }
+
+        function renderCalendar(calendar) {
+            const container = document.getElementById('calendar');
+
+            const header = `
+                <div class="calendar-header">
+                    <button onclick="previousMonth()">← Previous</button>
+                    <h3>${calendar.monthName} ${calendar.year}</h3>
+                    <button onclick="nextMonth()">Next →</button>
+                </div>
+            `;
+
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                .map(day => `<div class="calendar-day-header">${day}</div>`)
+                .join('');
+
+            const days = calendar.days.map(day => {
+                const classes = ['calendar-day'];
+                if (day.isToday) classes.push('day-today');
+                if (day.isPast) classes.push('day-past');
+                if (!day.isOpen) classes.push('day-closed');
+                if (day.hasAvailability) classes.push('has-availability');
+
+                return `
+                    <div class="${classes.join(' ')}" onclick="selectDate('${day.date}')">
+                        <div class="day-number">${day.dayOfMonth}</div>
+                        ${day.hasAvailability ? `<div class="day-slots">${day.availableSlots} slots</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                ${header}
+                <div class="calendar-grid">
+                    ${dayHeaders}
+                    ${days}
+                </div>
+            `;
+        }
+
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 1) {
+                currentMonth = 12;
+                currentYear--;
+            }
+            loadCalendar();
+        }
+
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 12) {
+                currentMonth = 1;
+                currentYear++;
+            }
+            loadCalendar();
+        }
+
+        function selectDate(date) {
+            console.log('Selected date:', date);
+            // In a full implementation, this would show available time slots
+            alert(`Selected ${new Date(date).toLocaleDateString()}. Time slot selection would appear here.`);
+        }
+
+        // Load on page load
+        loadBookingPage();
+    </script>
+</body>
+</html>
