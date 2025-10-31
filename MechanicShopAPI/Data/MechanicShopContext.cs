@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Models;
 using MechanicShopAPI.Services;
 
 namespace MechanicShopAPI.Data;
 
-public class MechanicShopContext : DbContext
+public class MechanicShopContext : IdentityDbContext<ApplicationUser>
 {
     private readonly ITenantAccessor _tenantAccessor;
 
@@ -24,6 +25,7 @@ public class MechanicShopContext : DbContext
     public DbSet<SiteSettings> SiteSettings { get; set; } = null!;
     public DbSet<Staff> Staff { get; set; } = null!;
     public DbSet<RepairOrder> RepairOrders { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -304,6 +306,35 @@ public class MechanicShopContext : DbContext
 
             // Global query filter for multi-tenancy
             entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
+        });
+
+        // Configure ApplicationUser
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.HasOne(e => e.Staff)
+                .WithMany()
+                .HasForeignKey(e => e.StaffId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasIndex(e => e.StaffId);
+        });
+
+        // Configure RefreshToken
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Token).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Token);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => new { e.UserId, e.IsRevoked });
         });
 
         // Configure SiteSettings

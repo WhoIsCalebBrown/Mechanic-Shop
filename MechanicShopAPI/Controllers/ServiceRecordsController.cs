@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
@@ -8,6 +9,7 @@ namespace MechanicShopAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = "RequireTechnician")] // Requires technician role or higher
 public class ServiceRecordsController : ControllerBase
 {
     private readonly MechanicShopContext _context;
