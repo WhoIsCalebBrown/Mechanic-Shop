@@ -22,6 +22,7 @@ interface NavigationContextType {
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useNavigationWithLoading = () => {
   const context = useContext(NavigationContext);
   if (!context) {

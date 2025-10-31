@@ -88,14 +88,14 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  token: string;
-  refreshToken?: string;
+  accessToken: string;
+  expiresAt?: string;
   user: AuthUser;
 }
 
 export interface TokenRefreshResponse {
-  token: string;
-  refreshToken?: string;
+  accessToken: string;
+  expiresAt?: string;
 }
 
 export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';

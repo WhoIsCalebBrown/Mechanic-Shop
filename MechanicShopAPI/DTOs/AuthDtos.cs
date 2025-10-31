@@ -53,7 +53,7 @@ public class StaffInfo
     public string LastName { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
-    public int TenantId { get; set; }
+    public int? TenantId { get; set; }  // Nullable until onboarding completes
     public string TenantSlug { get; set; } = string.Empty;
     public string TenantName { get; set; } = string.Empty;
 }

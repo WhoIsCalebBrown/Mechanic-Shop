@@ -4,8 +4,8 @@ public class Staff
 {
     public int Id { get; set; }
 
-    // Multi-tenancy
-    public int TenantId { get; set; }
+    // Multi-tenancy (nullable until onboarding completes)
+    public int? TenantId { get; set; }
 
     // User Identity (if using authentication system)
     public string? UserId { get; set; } // External auth system user ID

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import './LandingPage.css';
 
 interface SiteSettings {
@@ -58,6 +59,8 @@ interface SiteSettings {
 const LandingPage = () => {
   const statsRef = useRef<HTMLElement>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -153,15 +156,24 @@ const LandingPage = () => {
 
   const heroTitleLines = settings.heroTitle.split('\n');
 
+  const handleStaffPortalClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="landing-page">
       {/* Floating Staff Portal Button */}
-      <Link to="/dashboard" className="staff-portal-btn">
+      <a href="#" onClick={handleStaffPortalClick} className="staff-portal-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         <span>Staff Portal</span>
-      </Link>
+      </a>
 
       {/* Hero Section */}
       <section className="hero" id="home">
@@ -349,7 +361,7 @@ const LandingPage = () => {
             <h3>Quick Links</h3>
             <a href="#services">Services</a>
             <a href="#home">Home</a>
-            <a href="/dashboard">Staff Portal</a>
+            <a href="#" onClick={handleStaffPortalClick}>Staff Portal</a>
           </div>
         </div>
         <div className="footer-bottom">
