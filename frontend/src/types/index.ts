@@ -63,3 +63,39 @@ export type UpdateAppointment = Partial<CreateAppointment>;
 
 export type CreateServiceRecord = Omit<ServiceRecord, 'id' | 'createdAt' | 'totalCost'>;
 export type UpdateServiceRecord = Partial<CreateServiceRecord>;
+
+// Authentication Types
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  roles: string[];
+  tenantId?: string;
+  staffId?: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  businessName: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  refreshToken?: string;
+  user: AuthUser;
+}
+
+export interface TokenRefreshResponse {
+  token: string;
+  refreshToken?: string;
+}
+
+export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
