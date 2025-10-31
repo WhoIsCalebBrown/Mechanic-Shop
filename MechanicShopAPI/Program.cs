@@ -20,6 +20,9 @@ builder.Services.AddScoped<ITenantAccessor, TenantAccessor>();
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+// Add slug service
+builder.Services.AddScoped<ISlugService, SlugService>();
+
 // Configure PostgreSQL Database
 builder.Services.AddDbContext<MechanicShopContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")

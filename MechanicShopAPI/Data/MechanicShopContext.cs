@@ -26,6 +26,7 @@ public class MechanicShopContext : IdentityDbContext<ApplicationUser>
     public DbSet<Staff> Staff { get; set; } = null!;
     public DbSet<RepairOrder> RepairOrders { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<ServiceItem> ServiceItems { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -335,6 +336,28 @@ public class MechanicShopContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(e => e.Token);
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => new { e.UserId, e.IsRevoked });
+        });
+
+        // Configure ServiceItem
+        modelBuilder.Entity<ServiceItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.BasePrice).HasPrecision(10, 2);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany(t => t.ServiceItems)
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.IsActive });
+            entity.HasIndex(e => new { e.TenantId, e.IsBookableOnline });
+
+            // Global query filter for multi-tenancy
+            entity.HasQueryFilter(e => _tenantAccessor.TenantId == null || e.TenantId == _tenantAccessor.TenantId);
         });
 
         // Configure SiteSettings

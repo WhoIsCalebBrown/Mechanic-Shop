@@ -26,6 +26,15 @@ public class Tenant
     public DateTime? TrialEndsAt { get; set; }
     public DateTime? SubscriptionEndsAt { get; set; }
 
+    // Onboarding
+    public bool OnboardingCompleted { get; set; } = false;
+    public DateTime? OnboardingCompletedAt { get; set; }
+    public int OnboardingStep { get; set; } = 0; // Track current step in wizard
+
+    // Availability & Booking
+    public string? AvailabilityRules { get; set; } // JSON: Stored as AvailabilityRules model
+    public bool BookingEnabled { get; set; } = false; // Enable/disable public booking
+
     // Integration Settings (stored as JSON in PostgreSQL)
     public string? IntegrationSettings { get; set; } // JSON: { "stripe": {...}, "twilio": {...}, etc. }
 
@@ -51,6 +60,7 @@ public class Tenant
     public ICollection<ServiceRecord> ServiceRecords { get; set; } = new List<ServiceRecord>();
     public ICollection<Staff> Staff { get; set; } = new List<Staff>();
     public ICollection<RepairOrder> RepairOrders { get; set; } = new List<RepairOrder>();
+    public ICollection<ServiceItem> ServiceItems { get; set; } = new List<ServiceItem>();
 }
 
 public enum TenantPlan
