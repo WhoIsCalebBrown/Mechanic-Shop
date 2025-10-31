@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useNavigationWithLoading } from '../../UseNavigationWithLoading.tsx';
+import { useAuth } from '../../contexts/AuthContext';
 import FullScreenMenu from './FullScreenMenu';
 import './Layout.css';
 
@@ -10,8 +11,11 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { navigateWithLoading } = useNavigationWithLoading();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -19,6 +23,15 @@ export default function Layout({ children }: LayoutProps) {
     e.preventDefault();
     // Skip loading screen for regular navbar navigation
     navigateWithLoading(path, { skipLoading: true });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -75,6 +88,73 @@ export default function Layout({ children }: LayoutProps) {
             <a href="/admin/settings" onClick={(e) => handleNavClick(e, '/admin/settings')} className={isActive('/admin/settings') ? 'active' : ''}>
               Site Settings
             </a>
+          </li>
+          <li className="user-menu-container">
+            <button
+              className="user-menu-trigger"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              aria-label="User menu"
+            >
+              <div className="user-avatar">
+                {user?.email?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <span className="user-name">{user?.email}</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                className={`dropdown-icon ${showUserMenu ? 'open' : ''}`}
+              >
+                <path
+                  d="M6 9l6 6 6-6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            {showUserMenu && (
+              <div className="user-dropdown">
+                <div className="user-info">
+                  <p className="user-email">{user?.email}</p>
+                  {user?.roles && user.roles.length > 0 && (
+                    <p className="user-role">{user.roles.join(', ')}</p>
+                  )}
+                </div>
+                <div className="dropdown-divider"></div>
+                <button onClick={handleLogout} className="logout-button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <polyline
+                      points="16 17 21 12 16 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <line
+                      x1="21"
+                      y1="12"
+                      x2="9"
+                      y2="12"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Logout
+                </button>
+              </div>
+            )}
           </li>
         </ul>
       </nav>

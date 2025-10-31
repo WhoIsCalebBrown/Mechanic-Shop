@@ -1,8 +1,12 @@
 import { useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/layout/Layout';
 import LoadingScreen from './components/LoadingScreen';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
@@ -80,28 +84,86 @@ function AppContent() {
         />
       )}
       <Routes>
-        {/* Public landing page without dashboard layout */}
+        {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-        {/* Admin settings page with layout */}
-        <Route path="/admin/settings" element={<Layout><AdminSettingsPage /></Layout>} />
+        {/* Protected routes - Admin settings (Owner only) */}
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute requiredRoles={['Owner']}>
+              <Layout>
+                <AdminSettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Staff dashboard routes with layout */}
-        <Route path="/dashboard" element={<Layout><DashboardPage /></Layout>} />
-        <Route path="/customers" element={<Layout><CustomersPage /></Layout>} />
-        <Route path="/vehicles" element={<Layout><VehiclesPage /></Layout>} />
-        <Route path="/appointments" element={<Layout><AppointmentsPage /></Layout>} />
-        <Route path="/service-records" element={<Layout><ServiceRecordsPage /></Layout>} />
+        {/* Protected routes - Staff dashboard (All authenticated users) */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DashboardPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CustomersPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vehicles"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <VehiclesPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <AppointmentsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/service-records"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ServiceRecordsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </NavigationContext.Provider>
   );
 }
 
 function UseNavigationWithLoading() {
-  // Remove initial loading screen - it's not needed
+  // Wrap app with AuthProvider for global auth state
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

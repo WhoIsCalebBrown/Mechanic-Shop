@@ -195,6 +195,135 @@
   transform: scale(1.1);
 }
 
+/* User Menu Styles */
+.user-menu-container {
+  position: relative;
+  margin-left: auto;
+}
+
+.user-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--audi-white);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.9rem;
+  margin: 0.75rem 0;
+}
+
+.user-menu-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--audi-red);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--audi-red);
+  color: var(--audi-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.user-name {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.dropdown-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--audi-white);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  min-width: 220px;
+  overflow: hidden;
+  animation: dropdownSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2000;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-info {
+  padding: 1rem;
+  background: var(--audi-light-gray);
+}
+
+.user-email {
+  color: var(--audi-dark-gray);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 0.25rem 0;
+  word-break: break-all;
+}
+
+.user-role {
+  color: var(--audi-gray);
+  font-size: 0.8rem;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.logout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: none;
+  border: none;
+  color: var(--audi-dark-gray);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+
+.logout-button:hover {
+  background: var(--audi-light-gray);
+  color: var(--audi-red);
+}
+
+.logout-button svg {
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .nav-brand {
     padding: 1rem 1.5rem;
@@ -232,6 +361,10 @@
   .main-content {
     padding: 1.5rem;
   }
+
+  .user-menu-container {
+    display: none;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -240,6 +373,10 @@
   }
 
   .nav-links {
+    display: none;
+  }
+
+  .user-menu-container {
     display: none;
   }
 }
