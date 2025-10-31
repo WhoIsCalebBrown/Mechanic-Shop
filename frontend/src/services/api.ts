@@ -25,6 +25,9 @@ function getAuthHeaders(): HeadersInit {
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    console.log('[API] Auth header added to request');
+  } else {
+    console.warn('[API] No token available, request will be unauthorized');
   }
 
   return headers;

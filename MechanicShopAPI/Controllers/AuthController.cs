@@ -76,6 +76,28 @@ public class AuthController : ControllerBase
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         }
 
+        // For new shop owner registrations, create a Staff record automatically
+        // This allows them to go through the onboarding wizard
+        if (!user.StaffId.HasValue)
+        {
+            var staff = new Staff
+            {
+                FirstName = request.Email.Split('@')[0], // Temporary, will be updated in onboarding
+                LastName = "", // Will be updated in onboarding
+                Email = request.Email,
+                Status = StaffStatus.Active,
+                CreatedAt = DateTime.UtcNow
+                // TenantId and Role will be set during onboarding
+            };
+
+            _context.Staff.Add(staff);
+            await _context.SaveChangesAsync();
+
+            // Link the staff record to the user
+            user.StaffId = staff.Id;
+            await _userManager.UpdateAsync(user);
+        }
+
         // Generate tokens
         var accessToken = await _jwtService.GenerateAccessToken(user);
         var refreshToken = await _jwtService.GenerateRefreshToken(user, GetIpAddress());

@@ -23,6 +23,18 @@ export default function ProtectedRoute({ children, requiredRoles }: ProtectedRou
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // Check if user needs to complete onboarding
+  // Users without tenantId need to complete onboarding (except when already on onboarding page)
+  // TenantId is nested in user.staff.tenantId from the API response
+  const hasTenant = user?.tenantId || user?.staff?.tenantId;
+
+  if (location.pathname !== '/onboarding' && user && !hasTenant) {
+    console.log('[ProtectedRoute] User has no tenant, redirecting to onboarding');
+    console.log('[ProtectedRoute] User object:', user);
+    console.log('[ProtectedRoute] User tenantId:', hasTenant);
+    return <Navigate to="/onboarding" replace />;
+  }
+
   // Check role-based access if required roles are specified
   if (requiredRoles && requiredRoles.length > 0) {
     const hasRequiredRole = requiredRoles.some((role) => user?.roles.includes(role));

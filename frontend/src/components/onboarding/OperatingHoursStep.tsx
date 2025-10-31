@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOnboarding } from '../../contexts/OnboardingContext';
-import type { DaySchedule, DayOfWeek } from '../../types';
+import type { DayOfWeek } from '../../types';
 import './OnboardingSteps.css';
 
 export default function OperatingHoursStep() {

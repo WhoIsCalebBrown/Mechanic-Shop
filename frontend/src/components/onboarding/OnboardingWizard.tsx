@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../contexts/OnboardingContext';
+import { onboardingApi, convertOnboardingDataToRequest } from '../../services/onboarding';
 import BusinessProfileStep from './BusinessProfileStep';
 import ServiceAreaStep from './ServiceAreaStep';
 import OperatingHoursStep from './OperatingHoursStep';
@@ -17,6 +19,7 @@ const STEPS: OnboardingStep[] = [
 
 export default function OnboardingWizard() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const { currentStep, setCurrentStep, canProceedToNextStep, onboardingData } = useOnboarding();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,18 +50,25 @@ export default function OnboardingWizard() {
     setError(null);
 
     try {
-      // TODO: Call API to save onboarding data
-      // await onboardingApi.complete(onboardingData);
+      // Convert frontend data to backend format
+      const request = convertOnboardingDataToRequest(onboardingData);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log('[Onboarding] Submitting onboarding data...');
+      const response = await onboardingApi.complete(request);
 
-      console.log('Onboarding completed:', onboardingData);
+      console.log('[Onboarding] Onboarding completed successfully:', response);
 
-      // Navigate to dashboard
-      navigate('/dashboard');
+      // Onboarding is complete! Now we need to get a fresh JWT with tenant claims
+      // The easiest way is to log out and have the user log back in
+      alert('Setup complete! Please log in again to access your dashboard.');
+
+      // Log out to clear the old token
+      await logout();
+
+      // Navigate to login page
+      navigate('/login');
     } catch (err) {
-      console.error('Onboarding submission failed:', err);
+      console.error('[Onboarding] Submission failed:', err);
       setError(err instanceof Error ? err.message : 'Failed to complete onboarding. Please try again.');
     } finally {
       setIsSubmitting(false);

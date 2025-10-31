@@ -50,8 +50,13 @@ public class JwtService : IJwtService
                 claims.Add(new Claim("staff_id", staff.Id.ToString()));
                 claims.Add(new Claim("staff_role", staff.Role.ToString()));
                 claims.Add(new Claim("staff_status", staff.Status.ToString()));
-                claims.Add(new Claim("tenant_id", staff.TenantId.ToString()));
-                claims.Add(new Claim("tenant_slug", staff.Tenant.Slug));
+
+                // Only add tenant claims if staff has been linked to a tenant
+                if (staff.TenantId.HasValue && staff.Tenant != null)
+                {
+                    claims.Add(new Claim("tenant_id", staff.TenantId.Value.ToString()));
+                    claims.Add(new Claim("tenant_slug", staff.Tenant.Slug));
+                }
             }
         }
 

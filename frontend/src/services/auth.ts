@@ -21,14 +21,18 @@ const TOKEN_KEY = 'auth_token';
 
 export const tokenManager = {
   getToken: (): string | null => {
-    return localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
+    console.log('[TokenManager] Getting token:', token ? 'Token exists' : 'No token');
+    return token;
   },
 
   setToken: (token: string): void => {
+    console.log('[TokenManager] Setting token');
     localStorage.setItem(TOKEN_KEY, token);
   },
 
   removeToken: (): void => {
+    console.log('[TokenManager] Removing token');
     localStorage.removeItem(TOKEN_KEY);
   },
 
@@ -46,6 +50,7 @@ export const tokenManager = {
 // Authentication API
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
+    console.log('[Auth] Attempting login for:', credentials.email);
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,9 +59,19 @@ export const authApi = {
     });
     const data = await handleResponse<AuthResponse>(response);
 
+    console.log('[Auth] Login response received:', {
+      hasToken: !!data.accessToken,
+      hasUser: !!data.user,
+      responseKeys: Object.keys(data),
+      fullResponse: data
+    });
+
     // Store the access token
-    if (data.token) {
-      tokenManager.setToken(data.token);
+    if (data.accessToken) {
+      console.log('[Auth] Storing token from login response');
+      tokenManager.setToken(data.accessToken);
+    } else {
+      console.error('[Auth] No token in login response! Response:', data);
     }
 
     return data;
@@ -72,8 +87,8 @@ export const authApi = {
     const authResponse = await handleResponse<AuthResponse>(response);
 
     // Store the access token
-    if (authResponse.token) {
-      tokenManager.setToken(authResponse.token);
+    if (authResponse.accessToken) {
+      tokenManager.setToken(authResponse.accessToken);
     }
 
     return authResponse;
@@ -108,8 +123,8 @@ export const authApi = {
     const data = await handleResponse<TokenRefreshResponse>(response);
 
     // Update the access token
-    if (data.token) {
-      tokenManager.setToken(data.token);
+    if (data.accessToken) {
+      tokenManager.setToken(data.accessToken);
     }
 
     return data;
@@ -138,16 +153,29 @@ export const authApi = {
   decodeToken: (token: string): Partial<AuthUser> | null => {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+
+      console.log('[Auth] JWT Payload:', payload);
+
+      // Extract roles from staff_role claim
+      const staffRole = payload.staff_role || payload.role;
+      const roles = staffRole ? (Array.isArray(staffRole) ? staffRole : [staffRole]) : [];
+
+      // Get tenant_id - it might be a string that needs to be checked
+      const tenantId = payload.tenant_id || payload.tenantId;
+
+      console.log('[Auth] Decoded tenantId:', tenantId, 'type:', typeof tenantId);
+
       return {
         id: payload.sub || payload.userId,
         email: payload.email,
-        firstName: payload.firstName,
-        lastName: payload.lastName,
-        roles: payload.role ? (Array.isArray(payload.role) ? payload.role : [payload.role]) : [],
-        tenantId: payload.tenantId,
-        staffId: payload.staffId,
+        firstName: payload.firstName || payload.given_name,
+        lastName: payload.lastName || payload.family_name,
+        roles: roles,
+        tenantId: tenantId,
+        staffId: payload.staff_id || payload.staffId,
       };
-    } catch {
+    } catch (error) {
+      console.error('Failed to decode token:', error);
       return null;
     }
   },
