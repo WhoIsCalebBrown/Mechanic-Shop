@@ -99,3 +99,66 @@ export interface TokenRefreshResponse {
 }
 
 export type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
+
+// Onboarding Wizard Types
+export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+export interface TimeSlot {
+  open: string; // HH:MM format (24-hour)
+  close: string; // HH:MM format (24-hour)
+}
+
+export interface DaySchedule {
+  day: DayOfWeek;
+  isOpen: boolean;
+  timeSlots: TimeSlot[];
+}
+
+export interface BusinessProfile {
+  businessName: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  phone: string;
+  email?: string;
+  logoUrl?: string;
+}
+
+export interface ServiceArea {
+  city: string;
+  state: string;
+  radiusMiles: number;
+}
+
+export interface ServiceTemplate {
+  id: string;
+  name: string;
+  description: string;
+  estimatedDuration: number; // in minutes
+  basePrice?: number;
+  category: string;
+}
+
+export interface OnboardingData {
+  businessProfile: BusinessProfile;
+  serviceArea: ServiceArea;
+  operatingHours: DaySchedule[];
+  selectedServices: ServiceTemplate[];
+  slug?: string;
+}
+
+export interface OnboardingStep {
+  id: number;
+  title: string;
+  description: string;
+}
+
+// API types for onboarding completion
+export interface CompleteOnboardingRequest {
+  businessProfile: BusinessProfile;
+  serviceArea: ServiceArea;
+  operatingHours: DaySchedule[];
+  selectedServices: ServiceTemplate[];
+  slug: string;
+}

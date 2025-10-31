@@ -1,0 +1,50 @@
+.onboarding-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--audi-light-gray) 0%, #e8e8e8 100%);
+}
+
+.onboarding-header {
+  background: linear-gradient(180deg, var(--audi-black) 0%, #1a1a1a 100%);
+  color: var(--audi-white);
+  padding: 3rem 2rem;
+  text-align: center;
+  border-bottom: 3px solid var(--audi-red);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-content h1 {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin: 0 0 1rem 0;
+}
+
+.header-content p {
+  font-size: 1.1rem;
+  color: var(--audi-gray);
+  margin: 0;
+}
+
+.onboarding-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+}
+
+@media (max-width: 768px) {
+  .onboarding-header {
+    padding: 2rem 1.5rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .header-content p {
+    font-size: 1rem;
+  }
+
+  .onboarding-container {
+    padding: 2rem 1rem;
+  }
+}
