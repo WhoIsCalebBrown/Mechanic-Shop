@@ -1,0 +1,157 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Detect what changed to run only necessary tests
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'MechanicShopAPI/**'
+              - 'MechanicShopAPI.Tests/**'
+            frontend:
+              - 'frontend/**'
+
+  # Backend tests (only if backend files changed)
+  backend-tests:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mechanicshop_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore MechanicShopAPI
+
+      - name: Build
+        run: dotnet build MechanicShopAPI --no-restore --configuration Release
+
+      - name: Run backend tests
+        run: dotnet test MechanicShopAPI.Tests --no-build --verbosity normal --configuration Release
+        env:
+          ConnectionStrings__DefaultConnection: "Host=localhost;Database=mechanicshop_test;Username=postgres;Password=postgres"
+
+  # Frontend tests (only if frontend files changed)
+  frontend-tests:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Lint
+        run: |
+          cd frontend
+          npm run lint
+        continue-on-error: true  # Don't fail build on lint warnings
+
+      - name: Type check & Build
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+        if: hashFiles('frontend/playwright.config.ts') != ''
+
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npm test
+        if: hashFiles('frontend/playwright.config.ts') != ''
+        continue-on-error: true  # Don't fail if tests not set up yet
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: frontend/test-results/
+          retention-days: 7
+
+  # Build check (runs on all changes)
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build backend
+        run: |
+          cd MechanicShopAPI
+          dotnet build --configuration Release
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            MechanicShopAPI/bin/Release/
+            frontend/dist/
+          retention-days: 7

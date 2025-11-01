@@ -147,33 +147,24 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT support
-builder.Services.AddSwaggerGen(options =>
+// Configure OpenAPI with NSwag (better TypeScript generation than Swashbuckle)
+builder.Services.AddOpenApiDocument(config =>
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    config.DocumentName = "v1";
+    config.Title = "Mechanic Shop API";
+    config.Version = "v1";
+    config.Description = "API for managing mechanic shop operations";
+
+    // Add JWT authentication to OpenAPI spec
+    config.AddSecurity("Bearer", new NSwag.OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
+        Type = NSwag.OpenApiSecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
         Description = "Enter your JWT token"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
+    config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 });
 
 // Configure CORS for React frontend
@@ -201,8 +192,9 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Enable OpenAPI/Swagger with NSwag
+    app.UseOpenApi(); // Serves the OpenAPI spec at /swagger/v1/swagger.json
+    app.UseSwaggerUi(); // Serves the Swagger UI at /swagger
 }
 
 app.UseHttpsRedirection();

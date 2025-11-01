@@ -1,0 +1,63 @@
+{
+  "runtime": "Net90",
+  "documentGenerator": {
+    "aspNetCoreToOpenApi": {
+      "project": "MechanicShopAPI/MechanicShopAPI.csproj",
+      "output": "frontend/src/generated/openapi.json"
+    }
+  },
+  "codeGenerators": {
+    "openApiToTypeScriptClient": {
+      "className": "ApiClient",
+      "moduleName": "",
+      "template": "Fetch",
+      "promiseType": "Promise",
+      "typeScriptGeneratorSettings": {
+        "typeScriptVersion": 5.0,
+        "generateClientClasses": true,
+        "generateClientInterfaces": false,
+        "generateOptionalParameters": true,
+        "exportTypes": true,
+        "wrapDtoExceptions": true,
+        "exceptionClass": "ApiException",
+        "clientBaseClass": null,
+        "wrapResponses": false,
+        "wrapResponseMethods": [],
+        "generateResponseClasses": true,
+        "responseClass": "SwaggerResponse",
+        "protectedMethods": [],
+        "configurationClass": null,
+        "useTransformOptionsMethod": false,
+        "useTransformResultMethod": false,
+        "generateDtoTypes": true,
+        "operationGenerationMode": "MultipleClientsFromOperationId",
+        "markOptionalProperties": true,
+        "generateCloneMethod": false,
+        "typeStyle": "Interface",
+        "enumStyle": "Enum",
+        "dateTimeType": "Date",
+        "nullValue": "Undefined",
+        "generateDefaultValues": true,
+        "excludedTypeNames": [],
+        "excludedParameterNames": [],
+        "handleReferences": false,
+        "generateConstructorInterface": true,
+        "convertConstructorInterfaceData": false,
+        "importRequiredTypes": true,
+        "useGetBaseUrlMethod": false,
+        "baseUrlTokenName": "API_BASE_URL",
+        "queryNullValue": "",
+        "inlineNamedDictionaries": false,
+        "inlineNamedAny": false,
+        "includeHttpContext": false,
+        "templateDirectory": null,
+        "typeNameGeneratorType": null,
+        "propertyNameGeneratorType": null,
+        "enumNameGeneratorType": null,
+        "serviceHost": null,
+        "serviceSchemes": null,
+        "output": "frontend/src/generated/api.ts"
+      }
+    }
+  }
+}
