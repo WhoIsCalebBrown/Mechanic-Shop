@@ -167,7 +167,7 @@ builder.Services.AddOpenApiDocument(config =>
     config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("Bearer"));
 });
 
-// Configure CORS for React frontend
+// Configure CORS for React frontend + white-label subdomains
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -178,7 +178,20 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod()
                   .AllowCredentials(); // Required for HTTP-only cookies
         });
+
+    // Public CORS policy for white-label landing pages (supports subdomains)
+    options.AddPolicy("AllowPublicAccess",
+        policy =>
+        {
+            // Allow any origin for public endpoints (no credentials needed)
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
 });
+
+// Add response caching for public endpoints
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -201,6 +214,9 @@ app.UseHttpsRedirection();
 
 // Enable static files for the booking preview page
 app.UseStaticFiles();
+
+// Enable response caching for public endpoints
+app.UseResponseCaching();
 
 app.UseCors("AllowReactApp");
 

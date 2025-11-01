@@ -4,6 +4,10 @@ public class SiteSettings
 {
     public int Id { get; set; }
 
+    // Multi-tenancy
+    public int? TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+
     // Business Information
     public string BusinessName { get; set; } = "Precision Automotive";
     public string Tagline { get; set; } = "Expert Service for Your Vehicle";

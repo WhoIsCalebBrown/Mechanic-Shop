@@ -1248,6 +1248,99 @@ export class OnboardingClient {
     }
 }
 
+export class PublicClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "http://localhost:5000";
+    }
+
+    getPublicSettings(slug: string): Promise<PublicSiteSettingsDto> {
+        let url_ = this.baseUrl + "/api/public/{slug}";
+        if (slug === undefined || slug === null)
+            throw new globalThis.Error("The parameter 'slug' must be defined.");
+        url_ = url_.replace("{slug}", encodeURIComponent("" + slug));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetPublicSettings(_response);
+        });
+    }
+
+    protected processGetPublicSettings(response: Response): Promise<PublicSiteSettingsDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PublicSiteSettingsDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PublicSiteSettingsDto>(null as any);
+    }
+
+    submitContactForm(slug: string, contactForm: PublicContactFormDto): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/public/{slug}/contact";
+        if (slug === undefined || slug === null)
+            throw new globalThis.Error("The parameter 'slug' must be defined.");
+        url_ = url_.replace("{slug}", encodeURIComponent("" + slug));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(contactForm);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processSubmitContactForm(_response);
+        });
+    }
+
+    protected processSubmitContactForm(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+}
+
 export class ServiceRecordsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -5120,6 +5213,370 @@ export interface ICompleteOnboardingRequest {
     firstService: OnboardingStep3Request;
 }
 
+export class PublicSiteSettingsDto implements IPublicSiteSettingsDto {
+    businessName?: string;
+    tagline?: string;
+    description?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    vehiclesServiced?: number;
+    satisfactionRate?: number;
+    yearsExperience?: number;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
+    businessHours?: BusinessHourDto[];
+    bookingEnabled?: boolean;
+    timeZone?: string;
+
+    constructor(data?: IPublicSiteSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.businessName = _data["businessName"];
+            this.tagline = _data["tagline"];
+            this.description = _data["description"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.website = _data["website"];
+            this.address = _data["address"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.zipCode = _data["zipCode"];
+            this.country = _data["country"];
+            this.logoUrl = _data["logoUrl"];
+            this.primaryColor = _data["primaryColor"];
+            this.vehiclesServiced = _data["vehiclesServiced"];
+            this.satisfactionRate = _data["satisfactionRate"];
+            this.yearsExperience = _data["yearsExperience"];
+            this.heroTitle = _data["heroTitle"];
+            this.heroSubtitle = _data["heroSubtitle"];
+            this.primaryCtaText = _data["primaryCtaText"];
+            this.secondaryCtaText = _data["secondaryCtaText"];
+            this.heroImageUrl = _data["heroImageUrl"];
+            this.service1Title = _data["service1Title"];
+            this.service1Description = _data["service1Description"];
+            this.service1Feature1 = _data["service1Feature1"];
+            this.service1Feature2 = _data["service1Feature2"];
+            this.service1Feature3 = _data["service1Feature3"];
+            this.service1Feature4 = _data["service1Feature4"];
+            this.service1ImageUrl = _data["service1ImageUrl"];
+            this.service2Title = _data["service2Title"];
+            this.service2Description = _data["service2Description"];
+            this.service2Feature1 = _data["service2Feature1"];
+            this.service2Feature2 = _data["service2Feature2"];
+            this.service2Feature3 = _data["service2Feature3"];
+            this.service2Feature4 = _data["service2Feature4"];
+            this.service2ImageUrl = _data["service2ImageUrl"];
+            this.service3Title = _data["service3Title"];
+            this.service3Description = _data["service3Description"];
+            this.service3Feature1 = _data["service3Feature1"];
+            this.service3Feature2 = _data["service3Feature2"];
+            this.service3Feature3 = _data["service3Feature3"];
+            this.service3Feature4 = _data["service3Feature4"];
+            this.service3ImageUrl = _data["service3ImageUrl"];
+            this.whyFeature1Title = _data["whyFeature1Title"];
+            this.whyFeature1Description = _data["whyFeature1Description"];
+            this.whyFeature2Title = _data["whyFeature2Title"];
+            this.whyFeature2Description = _data["whyFeature2Description"];
+            this.whyFeature3Title = _data["whyFeature3Title"];
+            this.whyFeature3Description = _data["whyFeature3Description"];
+            this.whyFeature4Title = _data["whyFeature4Title"];
+            this.whyFeature4Description = _data["whyFeature4Description"];
+            this.ctaTitle = _data["ctaTitle"];
+            this.ctaSubtitle = _data["ctaSubtitle"];
+            this.ctaButtonText = _data["ctaButtonText"];
+            if (Array.isArray(_data["businessHours"])) {
+                this.businessHours = [] as any;
+                for (let item of _data["businessHours"])
+                    this.businessHours!.push(BusinessHourDto.fromJS(item));
+            }
+            this.bookingEnabled = _data["bookingEnabled"];
+            this.timeZone = _data["timeZone"];
+        }
+    }
+
+    static fromJS(data: any): PublicSiteSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PublicSiteSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["businessName"] = this.businessName;
+        data["tagline"] = this.tagline;
+        data["description"] = this.description;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["website"] = this.website;
+        data["address"] = this.address;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["zipCode"] = this.zipCode;
+        data["country"] = this.country;
+        data["logoUrl"] = this.logoUrl;
+        data["primaryColor"] = this.primaryColor;
+        data["vehiclesServiced"] = this.vehiclesServiced;
+        data["satisfactionRate"] = this.satisfactionRate;
+        data["yearsExperience"] = this.yearsExperience;
+        data["heroTitle"] = this.heroTitle;
+        data["heroSubtitle"] = this.heroSubtitle;
+        data["primaryCtaText"] = this.primaryCtaText;
+        data["secondaryCtaText"] = this.secondaryCtaText;
+        data["heroImageUrl"] = this.heroImageUrl;
+        data["service1Title"] = this.service1Title;
+        data["service1Description"] = this.service1Description;
+        data["service1Feature1"] = this.service1Feature1;
+        data["service1Feature2"] = this.service1Feature2;
+        data["service1Feature3"] = this.service1Feature3;
+        data["service1Feature4"] = this.service1Feature4;
+        data["service1ImageUrl"] = this.service1ImageUrl;
+        data["service2Title"] = this.service2Title;
+        data["service2Description"] = this.service2Description;
+        data["service2Feature1"] = this.service2Feature1;
+        data["service2Feature2"] = this.service2Feature2;
+        data["service2Feature3"] = this.service2Feature3;
+        data["service2Feature4"] = this.service2Feature4;
+        data["service2ImageUrl"] = this.service2ImageUrl;
+        data["service3Title"] = this.service3Title;
+        data["service3Description"] = this.service3Description;
+        data["service3Feature1"] = this.service3Feature1;
+        data["service3Feature2"] = this.service3Feature2;
+        data["service3Feature3"] = this.service3Feature3;
+        data["service3Feature4"] = this.service3Feature4;
+        data["service3ImageUrl"] = this.service3ImageUrl;
+        data["whyFeature1Title"] = this.whyFeature1Title;
+        data["whyFeature1Description"] = this.whyFeature1Description;
+        data["whyFeature2Title"] = this.whyFeature2Title;
+        data["whyFeature2Description"] = this.whyFeature2Description;
+        data["whyFeature3Title"] = this.whyFeature3Title;
+        data["whyFeature3Description"] = this.whyFeature3Description;
+        data["whyFeature4Title"] = this.whyFeature4Title;
+        data["whyFeature4Description"] = this.whyFeature4Description;
+        data["ctaTitle"] = this.ctaTitle;
+        data["ctaSubtitle"] = this.ctaSubtitle;
+        data["ctaButtonText"] = this.ctaButtonText;
+        if (Array.isArray(this.businessHours)) {
+            data["businessHours"] = [];
+            for (let item of this.businessHours)
+                data["businessHours"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["bookingEnabled"] = this.bookingEnabled;
+        data["timeZone"] = this.timeZone;
+        return data;
+    }
+}
+
+export interface IPublicSiteSettingsDto {
+    businessName?: string;
+    tagline?: string;
+    description?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    address?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    vehiclesServiced?: number;
+    satisfactionRate?: number;
+    yearsExperience?: number;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
+    businessHours?: BusinessHourDto[];
+    bookingEnabled?: boolean;
+    timeZone?: string;
+}
+
+export class BusinessHourDto implements IBusinessHourDto {
+    day?: string;
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+
+    constructor(data?: IBusinessHourDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.day = _data["day"];
+            this.isOpen = _data["isOpen"];
+            this.openTime = _data["openTime"];
+            this.closeTime = _data["closeTime"];
+        }
+    }
+
+    static fromJS(data: any): BusinessHourDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BusinessHourDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["day"] = this.day;
+        data["isOpen"] = this.isOpen;
+        data["openTime"] = this.openTime;
+        data["closeTime"] = this.closeTime;
+        return data;
+    }
+}
+
+export interface IBusinessHourDto {
+    day?: string;
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+}
+
+export class PublicContactFormDto implements IPublicContactFormDto {
+    name?: string;
+    email?: string;
+    phone?: string;
+    message?: string;
+    preferredService?: string | undefined;
+
+    constructor(data?: IPublicContactFormDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.email = _data["email"];
+            this.phone = _data["phone"];
+            this.message = _data["message"];
+            this.preferredService = _data["preferredService"];
+        }
+    }
+
+    static fromJS(data: any): PublicContactFormDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PublicContactFormDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["email"] = this.email;
+        data["phone"] = this.phone;
+        data["message"] = this.message;
+        data["preferredService"] = this.preferredService;
+        return data;
+    }
+}
+
+export interface IPublicContactFormDto {
+    name?: string;
+    email?: string;
+    phone?: string;
+    message?: string;
+    preferredService?: string | undefined;
+}
+
 export class CreateServiceRecordDto implements ICreateServiceRecordDto {
     vehicleId?: number;
     serviceDate?: Date;
@@ -5759,8 +6216,49 @@ export class TenantSettingsDto implements ITenantSettingsDto {
     timeZone?: string;
     logoUrl?: string | undefined;
     primaryColor?: string | undefined;
+    tagline?: string | undefined;
     notifications?: NotificationSettingsDto;
     availabilityRules?: AvailabilityRulesDto | undefined;
+    vehiclesServiced?: number;
+    satisfactionRate?: number;
+    yearsExperience?: number;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
     updatedAt?: Date | undefined;
 
     constructor(data?: ITenantSettingsDto) {
@@ -5788,8 +6286,49 @@ export class TenantSettingsDto implements ITenantSettingsDto {
             this.timeZone = _data["timeZone"];
             this.logoUrl = _data["logoUrl"];
             this.primaryColor = _data["primaryColor"];
+            this.tagline = _data["tagline"];
             this.notifications = _data["notifications"] ? NotificationSettingsDto.fromJS(_data["notifications"]) : undefined as any;
             this.availabilityRules = _data["availabilityRules"] ? AvailabilityRulesDto.fromJS(_data["availabilityRules"]) : undefined as any;
+            this.vehiclesServiced = _data["vehiclesServiced"];
+            this.satisfactionRate = _data["satisfactionRate"];
+            this.yearsExperience = _data["yearsExperience"];
+            this.heroTitle = _data["heroTitle"];
+            this.heroSubtitle = _data["heroSubtitle"];
+            this.primaryCtaText = _data["primaryCtaText"];
+            this.secondaryCtaText = _data["secondaryCtaText"];
+            this.heroImageUrl = _data["heroImageUrl"];
+            this.service1Title = _data["service1Title"];
+            this.service1Description = _data["service1Description"];
+            this.service1Feature1 = _data["service1Feature1"];
+            this.service1Feature2 = _data["service1Feature2"];
+            this.service1Feature3 = _data["service1Feature3"];
+            this.service1Feature4 = _data["service1Feature4"];
+            this.service1ImageUrl = _data["service1ImageUrl"];
+            this.service2Title = _data["service2Title"];
+            this.service2Description = _data["service2Description"];
+            this.service2Feature1 = _data["service2Feature1"];
+            this.service2Feature2 = _data["service2Feature2"];
+            this.service2Feature3 = _data["service2Feature3"];
+            this.service2Feature4 = _data["service2Feature4"];
+            this.service2ImageUrl = _data["service2ImageUrl"];
+            this.service3Title = _data["service3Title"];
+            this.service3Description = _data["service3Description"];
+            this.service3Feature1 = _data["service3Feature1"];
+            this.service3Feature2 = _data["service3Feature2"];
+            this.service3Feature3 = _data["service3Feature3"];
+            this.service3Feature4 = _data["service3Feature4"];
+            this.service3ImageUrl = _data["service3ImageUrl"];
+            this.whyFeature1Title = _data["whyFeature1Title"];
+            this.whyFeature1Description = _data["whyFeature1Description"];
+            this.whyFeature2Title = _data["whyFeature2Title"];
+            this.whyFeature2Description = _data["whyFeature2Description"];
+            this.whyFeature3Title = _data["whyFeature3Title"];
+            this.whyFeature3Description = _data["whyFeature3Description"];
+            this.whyFeature4Title = _data["whyFeature4Title"];
+            this.whyFeature4Description = _data["whyFeature4Description"];
+            this.ctaTitle = _data["ctaTitle"];
+            this.ctaSubtitle = _data["ctaSubtitle"];
+            this.ctaButtonText = _data["ctaButtonText"];
             this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
         }
     }
@@ -5817,8 +6356,49 @@ export class TenantSettingsDto implements ITenantSettingsDto {
         data["timeZone"] = this.timeZone;
         data["logoUrl"] = this.logoUrl;
         data["primaryColor"] = this.primaryColor;
+        data["tagline"] = this.tagline;
         data["notifications"] = this.notifications ? this.notifications.toJSON() : undefined as any;
         data["availabilityRules"] = this.availabilityRules ? this.availabilityRules.toJSON() : undefined as any;
+        data["vehiclesServiced"] = this.vehiclesServiced;
+        data["satisfactionRate"] = this.satisfactionRate;
+        data["yearsExperience"] = this.yearsExperience;
+        data["heroTitle"] = this.heroTitle;
+        data["heroSubtitle"] = this.heroSubtitle;
+        data["primaryCtaText"] = this.primaryCtaText;
+        data["secondaryCtaText"] = this.secondaryCtaText;
+        data["heroImageUrl"] = this.heroImageUrl;
+        data["service1Title"] = this.service1Title;
+        data["service1Description"] = this.service1Description;
+        data["service1Feature1"] = this.service1Feature1;
+        data["service1Feature2"] = this.service1Feature2;
+        data["service1Feature3"] = this.service1Feature3;
+        data["service1Feature4"] = this.service1Feature4;
+        data["service1ImageUrl"] = this.service1ImageUrl;
+        data["service2Title"] = this.service2Title;
+        data["service2Description"] = this.service2Description;
+        data["service2Feature1"] = this.service2Feature1;
+        data["service2Feature2"] = this.service2Feature2;
+        data["service2Feature3"] = this.service2Feature3;
+        data["service2Feature4"] = this.service2Feature4;
+        data["service2ImageUrl"] = this.service2ImageUrl;
+        data["service3Title"] = this.service3Title;
+        data["service3Description"] = this.service3Description;
+        data["service3Feature1"] = this.service3Feature1;
+        data["service3Feature2"] = this.service3Feature2;
+        data["service3Feature3"] = this.service3Feature3;
+        data["service3Feature4"] = this.service3Feature4;
+        data["service3ImageUrl"] = this.service3ImageUrl;
+        data["whyFeature1Title"] = this.whyFeature1Title;
+        data["whyFeature1Description"] = this.whyFeature1Description;
+        data["whyFeature2Title"] = this.whyFeature2Title;
+        data["whyFeature2Description"] = this.whyFeature2Description;
+        data["whyFeature3Title"] = this.whyFeature3Title;
+        data["whyFeature3Description"] = this.whyFeature3Description;
+        data["whyFeature4Title"] = this.whyFeature4Title;
+        data["whyFeature4Description"] = this.whyFeature4Description;
+        data["ctaTitle"] = this.ctaTitle;
+        data["ctaSubtitle"] = this.ctaSubtitle;
+        data["ctaButtonText"] = this.ctaButtonText;
         data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
         return data;
     }
@@ -5839,8 +6419,49 @@ export interface ITenantSettingsDto {
     timeZone?: string;
     logoUrl?: string | undefined;
     primaryColor?: string | undefined;
+    tagline?: string | undefined;
     notifications?: NotificationSettingsDto;
     availabilityRules?: AvailabilityRulesDto | undefined;
+    vehiclesServiced?: number;
+    satisfactionRate?: number;
+    yearsExperience?: number;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
     updatedAt?: Date | undefined;
 }
 
@@ -6126,8 +6747,49 @@ export class UpdateTenantSettingsDto implements IUpdateTenantSettingsDto {
     timeZone?: string | undefined;
     logoUrl?: string | undefined;
     primaryColor?: string | undefined;
+    tagline?: string | undefined;
     notifications?: NotificationSettingsDto | undefined;
     availabilityRules?: AvailabilityRulesDto | undefined;
+    vehiclesServiced?: number | undefined;
+    satisfactionRate?: number | undefined;
+    yearsExperience?: number | undefined;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
 
     constructor(data?: IUpdateTenantSettingsDto) {
         if (data) {
@@ -6153,8 +6815,49 @@ export class UpdateTenantSettingsDto implements IUpdateTenantSettingsDto {
             this.timeZone = _data["timeZone"];
             this.logoUrl = _data["logoUrl"];
             this.primaryColor = _data["primaryColor"];
+            this.tagline = _data["tagline"];
             this.notifications = _data["notifications"] ? NotificationSettingsDto.fromJS(_data["notifications"]) : undefined as any;
             this.availabilityRules = _data["availabilityRules"] ? AvailabilityRulesDto.fromJS(_data["availabilityRules"]) : undefined as any;
+            this.vehiclesServiced = _data["vehiclesServiced"];
+            this.satisfactionRate = _data["satisfactionRate"];
+            this.yearsExperience = _data["yearsExperience"];
+            this.heroTitle = _data["heroTitle"];
+            this.heroSubtitle = _data["heroSubtitle"];
+            this.primaryCtaText = _data["primaryCtaText"];
+            this.secondaryCtaText = _data["secondaryCtaText"];
+            this.heroImageUrl = _data["heroImageUrl"];
+            this.service1Title = _data["service1Title"];
+            this.service1Description = _data["service1Description"];
+            this.service1Feature1 = _data["service1Feature1"];
+            this.service1Feature2 = _data["service1Feature2"];
+            this.service1Feature3 = _data["service1Feature3"];
+            this.service1Feature4 = _data["service1Feature4"];
+            this.service1ImageUrl = _data["service1ImageUrl"];
+            this.service2Title = _data["service2Title"];
+            this.service2Description = _data["service2Description"];
+            this.service2Feature1 = _data["service2Feature1"];
+            this.service2Feature2 = _data["service2Feature2"];
+            this.service2Feature3 = _data["service2Feature3"];
+            this.service2Feature4 = _data["service2Feature4"];
+            this.service2ImageUrl = _data["service2ImageUrl"];
+            this.service3Title = _data["service3Title"];
+            this.service3Description = _data["service3Description"];
+            this.service3Feature1 = _data["service3Feature1"];
+            this.service3Feature2 = _data["service3Feature2"];
+            this.service3Feature3 = _data["service3Feature3"];
+            this.service3Feature4 = _data["service3Feature4"];
+            this.service3ImageUrl = _data["service3ImageUrl"];
+            this.whyFeature1Title = _data["whyFeature1Title"];
+            this.whyFeature1Description = _data["whyFeature1Description"];
+            this.whyFeature2Title = _data["whyFeature2Title"];
+            this.whyFeature2Description = _data["whyFeature2Description"];
+            this.whyFeature3Title = _data["whyFeature3Title"];
+            this.whyFeature3Description = _data["whyFeature3Description"];
+            this.whyFeature4Title = _data["whyFeature4Title"];
+            this.whyFeature4Description = _data["whyFeature4Description"];
+            this.ctaTitle = _data["ctaTitle"];
+            this.ctaSubtitle = _data["ctaSubtitle"];
+            this.ctaButtonText = _data["ctaButtonText"];
         }
     }
 
@@ -6180,8 +6883,49 @@ export class UpdateTenantSettingsDto implements IUpdateTenantSettingsDto {
         data["timeZone"] = this.timeZone;
         data["logoUrl"] = this.logoUrl;
         data["primaryColor"] = this.primaryColor;
+        data["tagline"] = this.tagline;
         data["notifications"] = this.notifications ? this.notifications.toJSON() : undefined as any;
         data["availabilityRules"] = this.availabilityRules ? this.availabilityRules.toJSON() : undefined as any;
+        data["vehiclesServiced"] = this.vehiclesServiced;
+        data["satisfactionRate"] = this.satisfactionRate;
+        data["yearsExperience"] = this.yearsExperience;
+        data["heroTitle"] = this.heroTitle;
+        data["heroSubtitle"] = this.heroSubtitle;
+        data["primaryCtaText"] = this.primaryCtaText;
+        data["secondaryCtaText"] = this.secondaryCtaText;
+        data["heroImageUrl"] = this.heroImageUrl;
+        data["service1Title"] = this.service1Title;
+        data["service1Description"] = this.service1Description;
+        data["service1Feature1"] = this.service1Feature1;
+        data["service1Feature2"] = this.service1Feature2;
+        data["service1Feature3"] = this.service1Feature3;
+        data["service1Feature4"] = this.service1Feature4;
+        data["service1ImageUrl"] = this.service1ImageUrl;
+        data["service2Title"] = this.service2Title;
+        data["service2Description"] = this.service2Description;
+        data["service2Feature1"] = this.service2Feature1;
+        data["service2Feature2"] = this.service2Feature2;
+        data["service2Feature3"] = this.service2Feature3;
+        data["service2Feature4"] = this.service2Feature4;
+        data["service2ImageUrl"] = this.service2ImageUrl;
+        data["service3Title"] = this.service3Title;
+        data["service3Description"] = this.service3Description;
+        data["service3Feature1"] = this.service3Feature1;
+        data["service3Feature2"] = this.service3Feature2;
+        data["service3Feature3"] = this.service3Feature3;
+        data["service3Feature4"] = this.service3Feature4;
+        data["service3ImageUrl"] = this.service3ImageUrl;
+        data["whyFeature1Title"] = this.whyFeature1Title;
+        data["whyFeature1Description"] = this.whyFeature1Description;
+        data["whyFeature2Title"] = this.whyFeature2Title;
+        data["whyFeature2Description"] = this.whyFeature2Description;
+        data["whyFeature3Title"] = this.whyFeature3Title;
+        data["whyFeature3Description"] = this.whyFeature3Description;
+        data["whyFeature4Title"] = this.whyFeature4Title;
+        data["whyFeature4Description"] = this.whyFeature4Description;
+        data["ctaTitle"] = this.ctaTitle;
+        data["ctaSubtitle"] = this.ctaSubtitle;
+        data["ctaButtonText"] = this.ctaButtonText;
         return data;
     }
 }
@@ -6200,8 +6944,49 @@ export interface IUpdateTenantSettingsDto {
     timeZone?: string | undefined;
     logoUrl?: string | undefined;
     primaryColor?: string | undefined;
+    tagline?: string | undefined;
     notifications?: NotificationSettingsDto | undefined;
     availabilityRules?: AvailabilityRulesDto | undefined;
+    vehiclesServiced?: number | undefined;
+    satisfactionRate?: number | undefined;
+    yearsExperience?: number | undefined;
+    heroTitle?: string | undefined;
+    heroSubtitle?: string | undefined;
+    primaryCtaText?: string | undefined;
+    secondaryCtaText?: string | undefined;
+    heroImageUrl?: string | undefined;
+    service1Title?: string | undefined;
+    service1Description?: string | undefined;
+    service1Feature1?: string | undefined;
+    service1Feature2?: string | undefined;
+    service1Feature3?: string | undefined;
+    service1Feature4?: string | undefined;
+    service1ImageUrl?: string | undefined;
+    service2Title?: string | undefined;
+    service2Description?: string | undefined;
+    service2Feature1?: string | undefined;
+    service2Feature2?: string | undefined;
+    service2Feature3?: string | undefined;
+    service2Feature4?: string | undefined;
+    service2ImageUrl?: string | undefined;
+    service3Title?: string | undefined;
+    service3Description?: string | undefined;
+    service3Feature1?: string | undefined;
+    service3Feature2?: string | undefined;
+    service3Feature3?: string | undefined;
+    service3Feature4?: string | undefined;
+    service3ImageUrl?: string | undefined;
+    whyFeature1Title?: string | undefined;
+    whyFeature1Description?: string | undefined;
+    whyFeature2Title?: string | undefined;
+    whyFeature2Description?: string | undefined;
+    whyFeature3Title?: string | undefined;
+    whyFeature3Description?: string | undefined;
+    whyFeature4Title?: string | undefined;
+    whyFeature4Description?: string | undefined;
+    ctaTitle?: string | undefined;
+    ctaSubtitle?: string | undefined;
+    ctaButtonText?: string | undefined;
 }
 
 export class CreateVehicleDto implements ICreateVehicleDto {

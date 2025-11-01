@@ -5,10 +5,10 @@ import Layout from './components/layout/Layout';
 import LoadingScreen from './components/LoadingScreen';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
+import PublicLandingPage from './pages/PublicLandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OnboardingPage from './pages/OnboardingPage';
-import AdminSettingsPage from './pages/AdminSettingsPage';
 import TenantSettingsPage from './pages/TenantSettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
@@ -89,6 +89,7 @@ function AppContent() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
+        <Route path="/shop/:slug" element={<PublicLandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -98,18 +99,6 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <OnboardingPage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Protected routes - Admin settings (Owner only) */}
-        <Route
-          path="/admin/settings"
-          element={
-            <ProtectedRoute requiredRoles={['Owner']}>
-              <Layout>
-                <AdminSettingsPage />
-              </Layout>
             </ProtectedRoute>
           }
         />

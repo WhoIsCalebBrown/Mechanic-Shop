@@ -89,11 +89,6 @@ export default function Layout({ children }: LayoutProps) {
               Settings
             </a>
           </li>
-          <li>
-            <a href="/admin/settings" onClick={(e) => handleNavClick(e, '/admin/settings')} className={isActive('/admin/settings') ? 'active' : ''}>
-              Site Settings
-            </a>
-          </li>
           <li className="user-menu-container">
             <button
               className="user-menu-trigger"

@@ -63,7 +63,60 @@ const TenantSettingsPage = () => {
         logoUrl: settings.logoUrl,
         primaryColor: settings.primaryColor,
         notifications: settings.notifications,
-        availabilityRules: settings.availabilityRules
+        availabilityRules: settings.availabilityRules,
+
+        // Public Profile - Stats
+        tagline: settings.tagline,
+        vehiclesServiced: settings.vehiclesServiced,
+        satisfactionRate: settings.satisfactionRate,
+        yearsExperience: settings.yearsExperience,
+
+        // Public Profile - Hero Section
+        heroTitle: settings.heroTitle,
+        heroSubtitle: settings.heroSubtitle,
+        primaryCtaText: settings.primaryCtaText,
+        secondaryCtaText: settings.secondaryCtaText,
+        heroImageUrl: settings.heroImageUrl,
+
+        // Public Profile - Services
+        service1Title: settings.service1Title,
+        service1Description: settings.service1Description,
+        service1Feature1: settings.service1Feature1,
+        service1Feature2: settings.service1Feature2,
+        service1Feature3: settings.service1Feature3,
+        service1Feature4: settings.service1Feature4,
+        service1ImageUrl: settings.service1ImageUrl,
+
+        service2Title: settings.service2Title,
+        service2Description: settings.service2Description,
+        service2Feature1: settings.service2Feature1,
+        service2Feature2: settings.service2Feature2,
+        service2Feature3: settings.service2Feature3,
+        service2Feature4: settings.service2Feature4,
+        service2ImageUrl: settings.service2ImageUrl,
+
+        service3Title: settings.service3Title,
+        service3Description: settings.service3Description,
+        service3Feature1: settings.service3Feature1,
+        service3Feature2: settings.service3Feature2,
+        service3Feature3: settings.service3Feature3,
+        service3Feature4: settings.service3Feature4,
+        service3ImageUrl: settings.service3ImageUrl,
+
+        // Public Profile - Why Choose Us
+        whyFeature1Title: settings.whyFeature1Title,
+        whyFeature1Description: settings.whyFeature1Description,
+        whyFeature2Title: settings.whyFeature2Title,
+        whyFeature2Description: settings.whyFeature2Description,
+        whyFeature3Title: settings.whyFeature3Title,
+        whyFeature3Description: settings.whyFeature3Description,
+        whyFeature4Title: settings.whyFeature4Title,
+        whyFeature4Description: settings.whyFeature4Description,
+
+        // Public Profile - CTA Section
+        ctaTitle: settings.ctaTitle,
+        ctaSubtitle: settings.ctaSubtitle,
+        ctaButtonText: settings.ctaButtonText
       };
 
       const updated = await tenantSettingsApi.update(updateDto);
@@ -237,6 +290,30 @@ const TenantSettingsPage = () => {
           onClick={() => setActiveTab('availability')}
         >
           Hours & Availability
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'hero' ? 'active' : ''}`}
+          onClick={() => setActiveTab('hero')}
+        >
+          Hero Section
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'services' ? 'active' : ''}`}
+          onClick={() => setActiveTab('services')}
+        >
+          Services
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
+          onClick={() => setActiveTab('stats')}
+        >
+          Stats & Features
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'cta' ? 'active' : ''}`}
+          onClick={() => setActiveTab('cta')}
+        >
+          CTA Section
         </button>
       </div>
 
@@ -583,6 +660,534 @@ const TenantSettingsPage = () => {
               }}>
                 + Add Date Override
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Hero Section Tab */}
+        {activeTab === 'hero' && (
+          <div className="tab-content">
+            <h2>Hero Section</h2>
+            <p className="tab-description">
+              Customize the main banner/hero section of your public landing page
+            </p>
+
+            <div className="form-grid">
+              <div className="form-group full-width">
+                <label htmlFor="heroTitle">Hero Title</label>
+                <textarea
+                  id="heroTitle"
+                  value={settings.heroTitle || ''}
+                  onChange={(e) => handleInputChange('heroTitle', e.target.value)}
+                  rows={3}
+                  placeholder="PRECISION\nAUTOMOTIVE\nCARE"
+                />
+                <p className="help-text">Main headline - use \n for line breaks</p>
+              </div>
+
+              <div className="form-group full-width">
+                <label htmlFor="heroSubtitle">Hero Subtitle</label>
+                <input
+                  type="text"
+                  id="heroSubtitle"
+                  value={settings.heroSubtitle || ''}
+                  onChange={(e) => handleInputChange('heroSubtitle', e.target.value)}
+                  placeholder="Expert Service for Your Vehicle"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="primaryCtaText">Primary Button Text</label>
+                <input
+                  type="text"
+                  id="primaryCtaText"
+                  value={settings.primaryCtaText || ''}
+                  onChange={(e) => handleInputChange('primaryCtaText', e.target.value)}
+                  placeholder="Schedule Service"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="secondaryCtaText">Secondary Button Text</label>
+                <input
+                  type="text"
+                  id="secondaryCtaText"
+                  value={settings.secondaryCtaText || ''}
+                  onChange={(e) => handleInputChange('secondaryCtaText', e.target.value)}
+                  placeholder="Our Services"
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label htmlFor="heroImageUrl">Hero Image URL</label>
+                <input
+                  type="url"
+                  id="heroImageUrl"
+                  value={settings.heroImageUrl || ''}
+                  onChange={(e) => handleInputChange('heroImageUrl', e.target.value)}
+                  placeholder="https://example.com/hero-image.jpg"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Services Tab */}
+        {activeTab === 'services' && (
+          <div className="tab-content">
+            <h2>Services</h2>
+            <p className="tab-description">
+              Showcase your main service offerings on your public page
+            </p>
+
+            {/* Service 1 */}
+            <div className="service-section">
+              <h3>Service 1</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="service1Title">Title</label>
+                  <input
+                    type="text"
+                    id="service1Title"
+                    value={settings.service1Title || ''}
+                    onChange={(e) => handleInputChange('service1Title', e.target.value)}
+                    placeholder="Routine Maintenance"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service1Description">Description</label>
+                  <textarea
+                    id="service1Description"
+                    value={settings.service1Description || ''}
+                    onChange={(e) => handleInputChange('service1Description', e.target.value)}
+                    rows={3}
+                    placeholder="Brief description of this service..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service1Feature1">Feature 1</label>
+                  <input
+                    type="text"
+                    id="service1Feature1"
+                    value={settings.service1Feature1 || ''}
+                    onChange={(e) => handleInputChange('service1Feature1', e.target.value)}
+                    placeholder="Oil & Filter Change"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service1Feature2">Feature 2</label>
+                  <input
+                    type="text"
+                    id="service1Feature2"
+                    value={settings.service1Feature2 || ''}
+                    onChange={(e) => handleInputChange('service1Feature2', e.target.value)}
+                    placeholder="Brake Inspection"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service1Feature3">Feature 3</label>
+                  <input
+                    type="text"
+                    id="service1Feature3"
+                    value={settings.service1Feature3 || ''}
+                    onChange={(e) => handleInputChange('service1Feature3', e.target.value)}
+                    placeholder="Tire Rotation"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service1Feature4">Feature 4</label>
+                  <input
+                    type="text"
+                    id="service1Feature4"
+                    value={settings.service1Feature4 || ''}
+                    onChange={(e) => handleInputChange('service1Feature4', e.target.value)}
+                    placeholder="Fluid Top-ups"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service1ImageUrl">Image URL</label>
+                  <input
+                    type="url"
+                    id="service1ImageUrl"
+                    value={settings.service1ImageUrl || ''}
+                    onChange={(e) => handleInputChange('service1ImageUrl', e.target.value)}
+                    placeholder="https://example.com/service1.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Service 2 */}
+            <div className="service-section">
+              <h3>Service 2</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="service2Title">Title</label>
+                  <input
+                    type="text"
+                    id="service2Title"
+                    value={settings.service2Title || ''}
+                    onChange={(e) => handleInputChange('service2Title', e.target.value)}
+                    placeholder="Diagnostics & Repair"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service2Description">Description</label>
+                  <textarea
+                    id="service2Description"
+                    value={settings.service2Description || ''}
+                    onChange={(e) => handleInputChange('service2Description', e.target.value)}
+                    rows={3}
+                    placeholder="Brief description of this service..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service2Feature1">Feature 1</label>
+                  <input
+                    type="text"
+                    id="service2Feature1"
+                    value={settings.service2Feature1 || ''}
+                    onChange={(e) => handleInputChange('service2Feature1', e.target.value)}
+                    placeholder="Computer Diagnostics"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service2Feature2">Feature 2</label>
+                  <input
+                    type="text"
+                    id="service2Feature2"
+                    value={settings.service2Feature2 || ''}
+                    onChange={(e) => handleInputChange('service2Feature2', e.target.value)}
+                    placeholder="Engine Repair"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service2Feature3">Feature 3</label>
+                  <input
+                    type="text"
+                    id="service2Feature3"
+                    value={settings.service2Feature3 || ''}
+                    onChange={(e) => handleInputChange('service2Feature3', e.target.value)}
+                    placeholder="Transmission Service"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service2Feature4">Feature 4</label>
+                  <input
+                    type="text"
+                    id="service2Feature4"
+                    value={settings.service2Feature4 || ''}
+                    onChange={(e) => handleInputChange('service2Feature4', e.target.value)}
+                    placeholder="Electrical Systems"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service2ImageUrl">Image URL</label>
+                  <input
+                    type="url"
+                    id="service2ImageUrl"
+                    value={settings.service2ImageUrl || ''}
+                    onChange={(e) => handleInputChange('service2ImageUrl', e.target.value)}
+                    placeholder="https://example.com/service2.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Service 3 */}
+            <div className="service-section">
+              <h3>Service 3</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="service3Title">Title</label>
+                  <input
+                    type="text"
+                    id="service3Title"
+                    value={settings.service3Title || ''}
+                    onChange={(e) => handleInputChange('service3Title', e.target.value)}
+                    placeholder="Performance Upgrades"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service3Description">Description</label>
+                  <textarea
+                    id="service3Description"
+                    value={settings.service3Description || ''}
+                    onChange={(e) => handleInputChange('service3Description', e.target.value)}
+                    rows={3}
+                    placeholder="Brief description of this service..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service3Feature1">Feature 1</label>
+                  <input
+                    type="text"
+                    id="service3Feature1"
+                    value={settings.service3Feature1 || ''}
+                    onChange={(e) => handleInputChange('service3Feature1', e.target.value)}
+                    placeholder="Engine Tuning"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service3Feature2">Feature 2</label>
+                  <input
+                    type="text"
+                    id="service3Feature2"
+                    value={settings.service3Feature2 || ''}
+                    onChange={(e) => handleInputChange('service3Feature2', e.target.value)}
+                    placeholder="Suspension Upgrades"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service3Feature3">Feature 3</label>
+                  <input
+                    type="text"
+                    id="service3Feature3"
+                    value={settings.service3Feature3 || ''}
+                    onChange={(e) => handleInputChange('service3Feature3', e.target.value)}
+                    placeholder="Exhaust Systems"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="service3Feature4">Feature 4</label>
+                  <input
+                    type="text"
+                    id="service3Feature4"
+                    value={settings.service3Feature4 || ''}
+                    onChange={(e) => handleInputChange('service3Feature4', e.target.value)}
+                    placeholder="Brake Upgrades"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="service3ImageUrl">Image URL</label>
+                  <input
+                    type="url"
+                    id="service3ImageUrl"
+                    value={settings.service3ImageUrl || ''}
+                    onChange={(e) => handleInputChange('service3ImageUrl', e.target.value)}
+                    placeholder="https://example.com/service3.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stats & Features Tab */}
+        {activeTab === 'stats' && (
+          <div className="tab-content">
+            <h2>Stats & Features</h2>
+            <p className="tab-description">
+              Highlight your achievements and key selling points
+            </p>
+
+            {/* Stats */}
+            <div className="stats-section">
+              <h3>Business Stats</h3>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="tagline">Tagline</label>
+                  <input
+                    type="text"
+                    id="tagline"
+                    value={settings.tagline || ''}
+                    onChange={(e) => handleInputChange('tagline', e.target.value)}
+                    placeholder="Expert Service for Your Vehicle"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="vehiclesServiced">Vehicles Serviced</label>
+                  <input
+                    type="number"
+                    id="vehiclesServiced"
+                    value={settings.vehiclesServiced || 0}
+                    onChange={(e) => handleInputChange('vehiclesServiced', parseInt(e.target.value) || 0)}
+                    min="0"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="satisfactionRate">Satisfaction Rate (%)</label>
+                  <input
+                    type="number"
+                    id="satisfactionRate"
+                    value={settings.satisfactionRate || 0}
+                    onChange={(e) => handleInputChange('satisfactionRate', parseInt(e.target.value) || 0)}
+                    min="0"
+                    max="100"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="yearsExperience">Years of Experience</label>
+                  <input
+                    type="number"
+                    id="yearsExperience"
+                    value={settings.yearsExperience || 0}
+                    onChange={(e) => handleInputChange('yearsExperience', parseInt(e.target.value) || 0)}
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Why Choose Us Features */}
+            <div className="why-section">
+              <h3>Why Choose Us Features</h3>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="whyFeature1Title">Feature 1 Title</label>
+                  <input
+                    type="text"
+                    id="whyFeature1Title"
+                    value={settings.whyFeature1Title || ''}
+                    onChange={(e) => handleInputChange('whyFeature1Title', e.target.value)}
+                    placeholder="Expert Technicians"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature1Description">Feature 1 Description</label>
+                  <input
+                    type="text"
+                    id="whyFeature1Description"
+                    value={settings.whyFeature1Description || ''}
+                    onChange={(e) => handleInputChange('whyFeature1Description', e.target.value)}
+                    placeholder="ASE-certified mechanics with decades of combined experience"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature2Title">Feature 2 Title</label>
+                  <input
+                    type="text"
+                    id="whyFeature2Title"
+                    value={settings.whyFeature2Title || ''}
+                    onChange={(e) => handleInputChange('whyFeature2Title', e.target.value)}
+                    placeholder="Quality Parts"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature2Description">Feature 2 Description</label>
+                  <input
+                    type="text"
+                    id="whyFeature2Description"
+                    value={settings.whyFeature2Description || ''}
+                    onChange={(e) => handleInputChange('whyFeature2Description', e.target.value)}
+                    placeholder="We use only OEM and premium aftermarket parts"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature3Title">Feature 3 Title</label>
+                  <input
+                    type="text"
+                    id="whyFeature3Title"
+                    value={settings.whyFeature3Title || ''}
+                    onChange={(e) => handleInputChange('whyFeature3Title', e.target.value)}
+                    placeholder="Transparent Pricing"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature3Description">Feature 3 Description</label>
+                  <input
+                    type="text"
+                    id="whyFeature3Description"
+                    value={settings.whyFeature3Description || ''}
+                    onChange={(e) => handleInputChange('whyFeature3Description', e.target.value)}
+                    placeholder="No hidden fees, detailed estimates before any work begins"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature4Title">Feature 4 Title</label>
+                  <input
+                    type="text"
+                    id="whyFeature4Title"
+                    value={settings.whyFeature4Title || ''}
+                    onChange={(e) => handleInputChange('whyFeature4Title', e.target.value)}
+                    placeholder="Warranty Coverage"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="whyFeature4Description">Feature 4 Description</label>
+                  <input
+                    type="text"
+                    id="whyFeature4Description"
+                    value={settings.whyFeature4Description || ''}
+                    onChange={(e) => handleInputChange('whyFeature4Description', e.target.value)}
+                    placeholder="All services backed by our comprehensive warranty"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CTA Section Tab */}
+        {activeTab === 'cta' && (
+          <div className="tab-content">
+            <h2>Call-to-Action Section</h2>
+            <p className="tab-description">
+              Customize the final call-to-action section on your public page
+            </p>
+
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="ctaTitle">CTA Title</label>
+                <input
+                  type="text"
+                  id="ctaTitle"
+                  value={settings.ctaTitle || ''}
+                  onChange={(e) => handleInputChange('ctaTitle', e.target.value)}
+                  placeholder="Ready to Get Started?"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="ctaSubtitle">CTA Subtitle</label>
+                <input
+                  type="text"
+                  id="ctaSubtitle"
+                  value={settings.ctaSubtitle || ''}
+                  onChange={(e) => handleInputChange('ctaSubtitle', e.target.value)}
+                  placeholder="Schedule your service appointment today"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="ctaButtonText">Button Text</label>
+                <input
+                  type="text"
+                  id="ctaButtonText"
+                  value={settings.ctaButtonText || ''}
+                  onChange={(e) => handleInputChange('ctaButtonText', e.target.value)}
+                  placeholder="Book Appointment"
+                />
+              </div>
             </div>
           </div>
         )}

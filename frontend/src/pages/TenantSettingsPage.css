@@ -493,6 +493,32 @@
   color: var(--audi-gray);
 }
 
+/* Public Profile Sections */
+.service-section,
+.stats-section,
+.why-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.service-section:last-child,
+.stats-section:last-child,
+.why-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.service-section h3,
+.stats-section h3,
+.why-section h3 {
+  color: var(--audi-dark-gray);
+  font-size: 1.25rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 600;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .form-grid {
