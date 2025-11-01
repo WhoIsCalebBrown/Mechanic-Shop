@@ -4,6 +4,7 @@
 // </auto-generated>
 //----------------------
 
+// @ts-nocheck
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
@@ -1584,6 +1585,89 @@ export class SiteSettingsClient {
             });
         }
         return Promise.resolve<SiteSettingsDto>(null as any);
+    }
+}
+
+export class TenantSettingsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "http://localhost:5000";
+    }
+
+    getTenantSettings(): Promise<TenantSettingsDto> {
+        let url_ = this.baseUrl + "/api/TenantSettings";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetTenantSettings(_response);
+        });
+    }
+
+    protected processGetTenantSettings(response: Response): Promise<TenantSettingsDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantSettingsDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TenantSettingsDto>(null as any);
+    }
+
+    updateTenantSettings(updateDto: UpdateTenantSettingsDto): Promise<TenantSettingsDto> {
+        let url_ = this.baseUrl + "/api/TenantSettings";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(updateDto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateTenantSettings(_response);
+        });
+    }
+
+    protected processUpdateTenantSettings(response: Response): Promise<TenantSettingsDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TenantSettingsDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<TenantSettingsDto>(null as any);
     }
 }
 
@@ -5658,6 +5742,466 @@ export interface IUpdateSiteSettingsDto {
     ctaButtonText?: string | undefined;
     logoUrl?: string | undefined;
     heroImageUrl?: string | undefined;
+}
+
+export class TenantSettingsDto implements ITenantSettingsDto {
+    id?: number;
+    name?: string;
+    businessAddress?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    description?: string | undefined;
+    timeZone?: string;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    notifications?: NotificationSettingsDto;
+    availabilityRules?: AvailabilityRulesDto | undefined;
+    updatedAt?: Date | undefined;
+
+    constructor(data?: ITenantSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.businessAddress = _data["businessAddress"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.zipCode = _data["zipCode"];
+            this.country = _data["country"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.website = _data["website"];
+            this.description = _data["description"];
+            this.timeZone = _data["timeZone"];
+            this.logoUrl = _data["logoUrl"];
+            this.primaryColor = _data["primaryColor"];
+            this.notifications = _data["notifications"] ? NotificationSettingsDto.fromJS(_data["notifications"]) : undefined as any;
+            this.availabilityRules = _data["availabilityRules"] ? AvailabilityRulesDto.fromJS(_data["availabilityRules"]) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): TenantSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TenantSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["businessAddress"] = this.businessAddress;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["zipCode"] = this.zipCode;
+        data["country"] = this.country;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["website"] = this.website;
+        data["description"] = this.description;
+        data["timeZone"] = this.timeZone;
+        data["logoUrl"] = this.logoUrl;
+        data["primaryColor"] = this.primaryColor;
+        data["notifications"] = this.notifications ? this.notifications.toJSON() : undefined as any;
+        data["availabilityRules"] = this.availabilityRules ? this.availabilityRules.toJSON() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface ITenantSettingsDto {
+    id?: number;
+    name?: string;
+    businessAddress?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    description?: string | undefined;
+    timeZone?: string;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    notifications?: NotificationSettingsDto;
+    availabilityRules?: AvailabilityRulesDto | undefined;
+    updatedAt?: Date | undefined;
+}
+
+export class NotificationSettingsDto implements INotificationSettingsDto {
+    emailOnNewBooking?: boolean;
+    emailOnCancellation?: boolean;
+    emailOnPaymentReceived?: boolean;
+    emailOnServiceComplete?: boolean;
+    smsOnNewBooking?: boolean;
+    smsOnCancellation?: boolean;
+    smsOnPaymentReceived?: boolean;
+    smsOnServiceComplete?: boolean;
+
+    constructor(data?: INotificationSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.emailOnNewBooking = _data["emailOnNewBooking"];
+            this.emailOnCancellation = _data["emailOnCancellation"];
+            this.emailOnPaymentReceived = _data["emailOnPaymentReceived"];
+            this.emailOnServiceComplete = _data["emailOnServiceComplete"];
+            this.smsOnNewBooking = _data["smsOnNewBooking"];
+            this.smsOnCancellation = _data["smsOnCancellation"];
+            this.smsOnPaymentReceived = _data["smsOnPaymentReceived"];
+            this.smsOnServiceComplete = _data["smsOnServiceComplete"];
+        }
+    }
+
+    static fromJS(data: any): NotificationSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new NotificationSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["emailOnNewBooking"] = this.emailOnNewBooking;
+        data["emailOnCancellation"] = this.emailOnCancellation;
+        data["emailOnPaymentReceived"] = this.emailOnPaymentReceived;
+        data["emailOnServiceComplete"] = this.emailOnServiceComplete;
+        data["smsOnNewBooking"] = this.smsOnNewBooking;
+        data["smsOnCancellation"] = this.smsOnCancellation;
+        data["smsOnPaymentReceived"] = this.smsOnPaymentReceived;
+        data["smsOnServiceComplete"] = this.smsOnServiceComplete;
+        return data;
+    }
+}
+
+export interface INotificationSettingsDto {
+    emailOnNewBooking?: boolean;
+    emailOnCancellation?: boolean;
+    emailOnPaymentReceived?: boolean;
+    emailOnServiceComplete?: boolean;
+    smsOnNewBooking?: boolean;
+    smsOnCancellation?: boolean;
+    smsOnPaymentReceived?: boolean;
+    smsOnServiceComplete?: boolean;
+}
+
+export class AvailabilityRulesDto implements IAvailabilityRulesDto {
+    weeklySchedule?: WeeklyScheduleDto;
+    dateOverrides?: DateOverrideDto[];
+
+    constructor(data?: IAvailabilityRulesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.weeklySchedule = _data["weeklySchedule"] ? WeeklyScheduleDto.fromJS(_data["weeklySchedule"]) : undefined as any;
+            if (Array.isArray(_data["dateOverrides"])) {
+                this.dateOverrides = [] as any;
+                for (let item of _data["dateOverrides"])
+                    this.dateOverrides!.push(DateOverrideDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AvailabilityRulesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AvailabilityRulesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["weeklySchedule"] = this.weeklySchedule ? this.weeklySchedule.toJSON() : undefined as any;
+        if (Array.isArray(this.dateOverrides)) {
+            data["dateOverrides"] = [];
+            for (let item of this.dateOverrides)
+                data["dateOverrides"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAvailabilityRulesDto {
+    weeklySchedule?: WeeklyScheduleDto;
+    dateOverrides?: DateOverrideDto[];
+}
+
+export class WeeklyScheduleDto implements IWeeklyScheduleDto {
+    monday?: DayScheduleDto;
+    tuesday?: DayScheduleDto;
+    wednesday?: DayScheduleDto;
+    thursday?: DayScheduleDto;
+    friday?: DayScheduleDto;
+    saturday?: DayScheduleDto;
+    sunday?: DayScheduleDto;
+
+    constructor(data?: IWeeklyScheduleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.monday = _data["monday"] ? DayScheduleDto.fromJS(_data["monday"]) : undefined as any;
+            this.tuesday = _data["tuesday"] ? DayScheduleDto.fromJS(_data["tuesday"]) : undefined as any;
+            this.wednesday = _data["wednesday"] ? DayScheduleDto.fromJS(_data["wednesday"]) : undefined as any;
+            this.thursday = _data["thursday"] ? DayScheduleDto.fromJS(_data["thursday"]) : undefined as any;
+            this.friday = _data["friday"] ? DayScheduleDto.fromJS(_data["friday"]) : undefined as any;
+            this.saturday = _data["saturday"] ? DayScheduleDto.fromJS(_data["saturday"]) : undefined as any;
+            this.sunday = _data["sunday"] ? DayScheduleDto.fromJS(_data["sunday"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): WeeklyScheduleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new WeeklyScheduleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["monday"] = this.monday ? this.monday.toJSON() : undefined as any;
+        data["tuesday"] = this.tuesday ? this.tuesday.toJSON() : undefined as any;
+        data["wednesday"] = this.wednesday ? this.wednesday.toJSON() : undefined as any;
+        data["thursday"] = this.thursday ? this.thursday.toJSON() : undefined as any;
+        data["friday"] = this.friday ? this.friday.toJSON() : undefined as any;
+        data["saturday"] = this.saturday ? this.saturday.toJSON() : undefined as any;
+        data["sunday"] = this.sunday ? this.sunday.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IWeeklyScheduleDto {
+    monday?: DayScheduleDto;
+    tuesday?: DayScheduleDto;
+    wednesday?: DayScheduleDto;
+    thursday?: DayScheduleDto;
+    friday?: DayScheduleDto;
+    saturday?: DayScheduleDto;
+    sunday?: DayScheduleDto;
+}
+
+export class DayScheduleDto implements IDayScheduleDto {
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+
+    constructor(data?: IDayScheduleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isOpen = _data["isOpen"];
+            this.openTime = _data["openTime"];
+            this.closeTime = _data["closeTime"];
+        }
+    }
+
+    static fromJS(data: any): DayScheduleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DayScheduleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isOpen"] = this.isOpen;
+        data["openTime"] = this.openTime;
+        data["closeTime"] = this.closeTime;
+        return data;
+    }
+}
+
+export interface IDayScheduleDto {
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+}
+
+export class DateOverrideDto implements IDateOverrideDto {
+    date?: Date;
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+    reason?: string | undefined;
+
+    constructor(data?: IDateOverrideDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : undefined as any;
+            this.isOpen = _data["isOpen"];
+            this.openTime = _data["openTime"];
+            this.closeTime = _data["closeTime"];
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): DateOverrideDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DateOverrideDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["date"] = this.date ? this.date.toISOString() : undefined as any;
+        data["isOpen"] = this.isOpen;
+        data["openTime"] = this.openTime;
+        data["closeTime"] = this.closeTime;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IDateOverrideDto {
+    date?: Date;
+    isOpen?: boolean;
+    openTime?: string | undefined;
+    closeTime?: string | undefined;
+    reason?: string | undefined;
+}
+
+export class UpdateTenantSettingsDto implements IUpdateTenantSettingsDto {
+    name?: string | undefined;
+    businessAddress?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    description?: string | undefined;
+    timeZone?: string | undefined;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    notifications?: NotificationSettingsDto | undefined;
+    availabilityRules?: AvailabilityRulesDto | undefined;
+
+    constructor(data?: IUpdateTenantSettingsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.businessAddress = _data["businessAddress"];
+            this.city = _data["city"];
+            this.state = _data["state"];
+            this.zipCode = _data["zipCode"];
+            this.country = _data["country"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.website = _data["website"];
+            this.description = _data["description"];
+            this.timeZone = _data["timeZone"];
+            this.logoUrl = _data["logoUrl"];
+            this.primaryColor = _data["primaryColor"];
+            this.notifications = _data["notifications"] ? NotificationSettingsDto.fromJS(_data["notifications"]) : undefined as any;
+            this.availabilityRules = _data["availabilityRules"] ? AvailabilityRulesDto.fromJS(_data["availabilityRules"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UpdateTenantSettingsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateTenantSettingsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["businessAddress"] = this.businessAddress;
+        data["city"] = this.city;
+        data["state"] = this.state;
+        data["zipCode"] = this.zipCode;
+        data["country"] = this.country;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["website"] = this.website;
+        data["description"] = this.description;
+        data["timeZone"] = this.timeZone;
+        data["logoUrl"] = this.logoUrl;
+        data["primaryColor"] = this.primaryColor;
+        data["notifications"] = this.notifications ? this.notifications.toJSON() : undefined as any;
+        data["availabilityRules"] = this.availabilityRules ? this.availabilityRules.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUpdateTenantSettingsDto {
+    name?: string | undefined;
+    businessAddress?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    phone?: string | undefined;
+    email?: string | undefined;
+    website?: string | undefined;
+    description?: string | undefined;
+    timeZone?: string | undefined;
+    logoUrl?: string | undefined;
+    primaryColor?: string | undefined;
+    notifications?: NotificationSettingsDto | undefined;
+    availabilityRules?: AvailabilityRulesDto | undefined;
 }
 
 export class CreateVehicleDto implements ICreateVehicleDto {

@@ -12,6 +12,10 @@ import type {
   CreateServiceRecord,
   UpdateServiceRecord,
 } from '../types';
+import type {
+  TenantSettingsDto,
+  UpdateTenantSettingsDto,
+} from '../generated/api';
 import { tokenManager, authApi } from './auth';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -315,5 +319,26 @@ export const serviceRecordApi = {
     });
     const response = await makeRequest();
     await handleResponse<void>(response, makeRequest);
+  },
+};
+
+// Tenant Settings API
+export const tenantSettingsApi = {
+  get: async (): Promise<TenantSettingsDto> => {
+    const makeRequest = () => fetch(`${API_BASE_URL}/tenantsettings`, {
+      headers: getAuthHeaders(),
+    });
+    const response = await makeRequest();
+    return handleResponse<TenantSettingsDto>(response, makeRequest);
+  },
+
+  update: async (settings: UpdateTenantSettingsDto): Promise<TenantSettingsDto> => {
+    const makeRequest = () => fetch(`${API_BASE_URL}/tenantsettings`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(settings),
+    });
+    const response = await makeRequest();
+    return handleResponse<TenantSettingsDto>(response, makeRequest);
   },
 };

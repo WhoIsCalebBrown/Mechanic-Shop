@@ -1,15 +1,11 @@
 import { test as setup } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 /**
  * Authentication Setup for Playwright Tests
  * This runs once before all tests to create an authenticated session
  */
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const authFile = path.join(__dirname, '../.auth/user.json');
+const authFile = 'tests/.auth/user.json';
 
 // Test user credentials - change these to match your test environment
 const TEST_USER = {

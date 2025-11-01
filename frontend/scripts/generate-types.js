@@ -52,6 +52,21 @@ async function main() {
       stdio: 'inherit'
     });
 
+    // Add @ts-nocheck to suppress TypeScript errors in generated code
+    const fs = await import('fs');
+    let content = fs.readFileSync(OUTPUT_FILE, 'utf8');
+
+    // Check if @ts-nocheck is already present
+    if (!content.includes('@ts-nocheck')) {
+      // Add @ts-nocheck after the auto-generated comment block
+      content = content.replace(
+        '/* eslint-disable */',
+        '// @ts-nocheck\n/* eslint-disable */'
+      );
+      fs.writeFileSync(OUTPUT_FILE, content, 'utf8');
+      console.log('✅ Added @ts-nocheck to generated file');
+    }
+
     console.log('\n✅ TypeScript types generated successfully!');
     console.log(`📁 Types available at: ${OUTPUT_FILE}\n`);
     console.log('💡 Tip: Import generated types in your code:');

@@ -25,6 +25,7 @@ export default function FullScreenMenu({ isOpen, onClose }: FullScreenMenuProps)
     { path: '/vehicles', label: 'Vehicles' },
     { path: '/appointments', label: 'Appointments' },
     { path: '/service-records', label: 'Service Records' },
+    { path: '/settings', label: 'Settings' },
   ];
 
   // Placeholder images - you can replace with your own

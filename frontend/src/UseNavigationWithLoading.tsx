@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OnboardingPage from './pages/OnboardingPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
+import TenantSettingsPage from './pages/TenantSettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
 import VehiclesPage from './pages/VehiclesPage';
@@ -108,6 +109,18 @@ function AppContent() {
             <ProtectedRoute requiredRoles={['Owner']}>
               <Layout>
                 <AdminSettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected routes - Tenant settings (Owner/Manager) */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute requiredRoles={['Owner', 'Manager']}>
+              <Layout>
+                <TenantSettingsPage />
               </Layout>
             </ProtectedRoute>
           }

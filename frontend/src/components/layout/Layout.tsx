@@ -85,6 +85,11 @@ export default function Layout({ children }: LayoutProps) {
             </a>
           </li>
           <li>
+            <a href="/settings" onClick={(e) => handleNavClick(e, '/settings')} className={isActive('/settings') ? 'active' : ''}>
+              Settings
+            </a>
+          </li>
+          <li>
             <a href="/admin/settings" onClick={(e) => handleNavClick(e, '/admin/settings')} className={isActive('/admin/settings') ? 'active' : ''}>
               Site Settings
             </a>
