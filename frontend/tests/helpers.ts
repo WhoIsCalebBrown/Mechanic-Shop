@@ -2,30 +2,35 @@ import { Page } from '@playwright/test';
 
 /**
  * Test user credentials
+ * This user is automatically created by the auth.setup.ts script
  */
 export const TEST_USER = {
-  email: 'test@mechanicshop.com',
+  email: 'playwright-test@mechanicshop.com',
   password: 'TestPassword123!',
-  shopOwner: {
-    email: 'owner@mechanicshop.com',
-    password: 'OwnerPassword123!',
-  },
+  firstName: 'Playwright',
+  lastName: 'Test',
 };
 
 /**
  * Helper function to login a user
+ * Uses the ACTUAL field IDs from LoginPage.tsx
  */
 export async function login(page: Page, email: string = TEST_USER.email, password: string = TEST_USER.password) {
   await page.goto('/login');
-  await page.getByLabel(/email|username/i).fill(email);
-  await page.getByLabel(/password/i).fill(password);
-  await page.getByRole('button', { name: /login|sign in/i }).click();
+  await page.waitForLoadState('networkidle');
 
-  // Wait for navigation or dashboard to load
+  // Fill login form using ACTUAL IDs
+  await page.locator('#email').fill(email);
+  await page.locator('#password').fill(password);
+
+  // Click the Sign In button
+  await page.getByRole('button', { name: /sign in/i }).click();
+
+  // Wait for navigation to dashboard
   try {
-    await page.waitForURL(/.*(?:dashboard|home)/i, { timeout: 5000 });
+    await page.waitForURL(/.*dashboard/i, { timeout: 5000 });
   } catch {
-    // If redirect doesn't happen, wait a moment and continue
+    // If redirect doesn't happen immediately, wait a bit
     await page.waitForTimeout(1000);
   }
 }
