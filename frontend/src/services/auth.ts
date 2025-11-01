@@ -160,10 +160,15 @@ export const authApi = {
       const staffRole = payload.staff_role || payload.role;
       const roles = staffRole ? (Array.isArray(staffRole) ? staffRole : [staffRole]) : [];
 
-      // Get tenant_id - it might be a string that needs to be checked
-      const tenantId = payload.tenant_id || payload.tenantId;
+      // Get tenant_id and convert to number if present
+      const tenantIdStr = payload.tenant_id || payload.tenantId;
+      const tenantId = tenantIdStr ? parseInt(tenantIdStr, 10) : undefined;
 
-      console.log('[Auth] Decoded tenantId:', tenantId, 'type:', typeof tenantId);
+      // Get staff_id and convert to number if present
+      const staffIdStr = payload.staff_id || payload.staffId;
+      const staffId = staffIdStr ? parseInt(staffIdStr, 10) : undefined;
+
+      console.log('[Auth] Decoded tenantId:', tenantId, 'staffId:', staffId);
 
       return {
         id: payload.sub || payload.userId,
@@ -172,7 +177,7 @@ export const authApi = {
         lastName: payload.lastName || payload.family_name,
         roles: roles,
         tenantId: tenantId,
-        staffId: payload.staff_id || payload.staffId,
+        staffId: staffId,
       };
     } catch (error) {
       console.error('Failed to decode token:', error);

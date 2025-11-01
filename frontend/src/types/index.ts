@@ -65,14 +65,27 @@ export type CreateServiceRecord = Omit<ServiceRecord, 'id' | 'createdAt' | 'tota
 export type UpdateServiceRecord = Partial<CreateServiceRecord>;
 
 // Authentication Types
+export interface StaffInfo {
+  id: number;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status: string;
+  tenantId: number;
+  tenantSlug: string;
+  tenantName: string;
+}
+
 export interface AuthUser {
   id: string;
   email: string;
+  staff?: StaffInfo;
+  // Legacy fields from JWT decode (for backward compatibility)
   firstName?: string;
   lastName?: string;
-  roles: string[];
-  tenantId?: string;
-  staffId?: string;
+  roles?: string[];
+  tenantId?: number;
+  staffId?: number;
 }
 
 export interface LoginRequest {
