@@ -74,7 +74,7 @@ public class ServiceRecordsController : ControllerBase
         {
             TenantId = _tenantAccessor.TenantId.Value,
             VehicleId = dto.VehicleId,
-            ServiceDate = dto.ServiceDate,
+            ServiceDate = DateTime.SpecifyKind(dto.ServiceDate, DateTimeKind.Utc),
             ServiceType = dto.ServiceType,
             Description = dto.Description,
             LaborCost = dto.LaborCost,
@@ -105,7 +105,7 @@ public class ServiceRecordsController : ControllerBase
         }
 
         serviceRecord.VehicleId = dto.VehicleId;
-        serviceRecord.ServiceDate = dto.ServiceDate;
+        serviceRecord.ServiceDate = DateTime.SpecifyKind(dto.ServiceDate, DateTimeKind.Utc);
         serviceRecord.ServiceType = dto.ServiceType;
         serviceRecord.Description = dto.Description;
         serviceRecord.LaborCost = dto.LaborCost;

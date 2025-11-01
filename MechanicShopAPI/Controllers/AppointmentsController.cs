@@ -88,7 +88,10 @@ public class AppointmentsController : ControllerBase
             TenantId = _tenantAccessor.TenantId.Value,
             CustomerId = dto.CustomerId,
             VehicleId = dto.VehicleId,
-            ScheduledDate = dto.ScheduledDate,
+            // If the date is already UTC (Kind=Utc), use it. Otherwise convert to UTC.
+            ScheduledDate = dto.ScheduledDate.Kind == DateTimeKind.Utc
+                ? dto.ScheduledDate
+                : dto.ScheduledDate.ToUniversalTime(),
             ServiceType = dto.ServiceType,
             Description = dto.Description,
             Status = dto.Status,
@@ -118,7 +121,10 @@ public class AppointmentsController : ControllerBase
 
         appointment.CustomerId = dto.CustomerId;
         appointment.VehicleId = dto.VehicleId;
-        appointment.ScheduledDate = dto.ScheduledDate;
+        // If the date is already UTC (Kind=Utc), use it. Otherwise convert to UTC.
+        appointment.ScheduledDate = dto.ScheduledDate.Kind == DateTimeKind.Utc
+            ? dto.ScheduledDate
+            : dto.ScheduledDate.ToUniversalTime();
         appointment.ServiceType = dto.ServiceType;
         appointment.Description = dto.Description;
         appointment.Status = dto.Status;

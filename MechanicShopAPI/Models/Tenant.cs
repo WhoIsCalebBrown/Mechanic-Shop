@@ -20,6 +20,9 @@ public class Tenant
     public string? LogoUrl { get; set; }
     public string? Description { get; set; }
 
+    // Timezone for scheduling (IANA timezone ID, e.g., "America/New_York", "America/Los_Angeles")
+    public string TimeZone { get; set; } = "America/New_York"; // Default to EST
+
     // Subscription & Plan
     public TenantPlan Plan { get; set; } = TenantPlan.Basic;
     public TenantStatus Status { get; set; } = TenantStatus.Active;

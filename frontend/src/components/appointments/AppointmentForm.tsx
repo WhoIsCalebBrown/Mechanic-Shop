@@ -76,7 +76,13 @@ export default function AppointmentForm({ appointment, onSubmit, onCancel }: App
     setError(null);
 
     try {
-      await onSubmit(formData);
+      // Convert the datetime-local value to a proper ISO 8601 string with timezone
+      const localDate = new Date(formData.scheduledDate);
+      const appointmentData = {
+        ...formData,
+        scheduledDate: localDate.toISOString(), // Sends with 'Z' (UTC) after conversion
+      };
+      await onSubmit(appointmentData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
