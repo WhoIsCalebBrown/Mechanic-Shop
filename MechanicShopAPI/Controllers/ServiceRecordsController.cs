@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
 using MechanicShopAPI.DTOs;
+using MechanicShopAPI.Services;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -13,10 +14,12 @@ namespace MechanicShopAPI.Controllers;
 public class ServiceRecordsController : ControllerBase
 {
     private readonly MechanicShopContext _context;
+    private readonly ITenantAccessor _tenantAccessor;
 
-    public ServiceRecordsController(MechanicShopContext context)
+    public ServiceRecordsController(MechanicShopContext context, ITenantAccessor tenantAccessor)
     {
         _context = context;
+        _tenantAccessor = tenantAccessor;
     }
 
     // GET: api/servicerecords
@@ -61,8 +64,15 @@ public class ServiceRecordsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ServiceRecord>> CreateServiceRecord(CreateServiceRecordDto dto)
     {
+        // Ensure tenant is resolved
+        if (!_tenantAccessor.TenantId.HasValue)
+        {
+            return BadRequest(new { error = "Tenant context not found. Please ensure you're authenticated." });
+        }
+
         var serviceRecord = new ServiceRecord
         {
+            TenantId = _tenantAccessor.TenantId.Value,
             VehicleId = dto.VehicleId,
             ServiceDate = dto.ServiceDate,
             ServiceType = dto.ServiceType,

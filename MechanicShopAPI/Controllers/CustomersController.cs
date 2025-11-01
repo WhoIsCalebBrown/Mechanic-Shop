@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
 using MechanicShopAPI.DTOs;
+using MechanicShopAPI.Services;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -13,10 +14,12 @@ namespace MechanicShopAPI.Controllers;
 public class CustomersController : ControllerBase
 {
     private readonly MechanicShopContext _context;
+    private readonly ITenantAccessor _tenantAccessor;
 
-    public CustomersController(MechanicShopContext context)
+    public CustomersController(MechanicShopContext context, ITenantAccessor tenantAccessor)
     {
         _context = context;
+        _tenantAccessor = tenantAccessor;
     }
 
     // GET: api/customers
@@ -50,8 +53,15 @@ public class CustomersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Customer>> CreateCustomer(CreateCustomerDto dto)
     {
+        // Ensure tenant is resolved
+        if (!_tenantAccessor.TenantId.HasValue)
+        {
+            return BadRequest(new { error = "Tenant context not found. Please ensure you're authenticated." });
+        }
+
         var customer = new Customer
         {
+            TenantId = _tenantAccessor.TenantId.Value,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Email = dto.Email,

@@ -89,8 +89,10 @@ public class TenantResolutionMiddleware
                 // Try to parse as int (tenant ID)
                 if (int.TryParse(tenantIdentifier, out var tenantId))
                 {
+                // Currently set so trial users can still add customers
                     var tenant = await dbContext.Set<Models.Tenant>()
-                        .Where(t => t.Id == tenantId && t.Status == Models.TenantStatus.Active)
+                        .Where(t => t.Id == tenantId &&
+                               (t.Status == Models.TenantStatus.Active || t.Status == Models.TenantStatus.Trial))
                         .Select(t => new { t.Id, t.Slug })
                         .FirstOrDefaultAsync();
 
@@ -115,7 +117,8 @@ public class TenantResolutionMiddleware
                 {
                     // Resolve by slug
                     var tenant = await dbContext.Set<Models.Tenant>()
-                        .Where(t => t.Slug == tenantIdentifier && t.Status == Models.TenantStatus.Active)
+                        .Where(t => t.Slug == tenantIdentifier &&
+                               (t.Status == Models.TenantStatus.Active || t.Status == Models.TenantStatus.Trial))
                         .Select(t => new { t.Id, t.Slug })
                         .FirstOrDefaultAsync();
 

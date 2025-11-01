@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MechanicShopAPI.Data;
 using MechanicShopAPI.Models;
 using MechanicShopAPI.DTOs;
+using MechanicShopAPI.Services;
 
 namespace MechanicShopAPI.Controllers;
 
@@ -13,10 +14,12 @@ namespace MechanicShopAPI.Controllers;
 public class AppointmentsController : ControllerBase
 {
     private readonly MechanicShopContext _context;
+    private readonly ITenantAccessor _tenantAccessor;
 
-    public AppointmentsController(MechanicShopContext context)
+    public AppointmentsController(MechanicShopContext context, ITenantAccessor tenantAccessor)
     {
         _context = context;
+        _tenantAccessor = tenantAccessor;
     }
 
     // GET: api/appointments
@@ -74,8 +77,15 @@ public class AppointmentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentDto dto)
     {
+        // Ensure tenant is resolved
+        if (!_tenantAccessor.TenantId.HasValue)
+        {
+            return BadRequest(new { error = "Tenant context not found. Please ensure you're authenticated." });
+        }
+
         var appointment = new Appointment
         {
+            TenantId = _tenantAccessor.TenantId.Value,
             CustomerId = dto.CustomerId,
             VehicleId = dto.VehicleId,
             ScheduledDate = dto.ScheduledDate,

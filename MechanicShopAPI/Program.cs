@@ -14,8 +14,8 @@ using MechanicShopAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add multi-tenancy services
-builder.Services.AddScoped<ITenantAccessor, TenantAccessor>();
+// Add multi-tenancy services (Singleton because it uses AsyncLocal for request context)
+builder.Services.AddSingleton<ITenantAccessor, TenantAccessor>();
 
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -213,11 +213,13 @@ app.UseCors("AllowReactApp");
 // Add rate limiting middleware (before authentication)
 app.UseRateLimiting();
 
-// Add tenant resolution middleware (before authentication)
+// Authentication must come before tenant resolution (so JWT claims are available)
+app.UseAuthentication();
+
+// Add tenant resolution middleware (after authentication, before authorization)
 app.UseTenantResolution();
 
-// Authentication must come before authorization
-app.UseAuthentication();
+// Authorization must come last
 app.UseAuthorization();
 
 app.MapControllers();
