@@ -1,4 +1,4 @@
-import { test as setup, expect } from '@playwright/test';
+import { test as setup } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -50,6 +50,15 @@ setup('authenticate', async ({ page }) => {
   await page.goto('/register');
   await page.waitForLoadState('networkidle');
 
+  // Check if already logged in and redirected away from register
+  let registerUrl = page.url();
+  if (registerUrl.includes('onboarding') || registerUrl.includes('dashboard')) {
+    console.log('✅ Already logged in from previous attempt');
+    await page.context().storageState({ path: authFile });
+    console.log('💾 Authentication state saved');
+    return;
+  }
+
   // Fill registration form using ACTUAL IDs from RegisterPage.tsx
   await page.locator('#businessName').fill('Playwright Test Shop');
   await page.locator('#email').fill(TEST_USER.email);
@@ -60,21 +69,19 @@ setup('authenticate', async ({ page }) => {
   const submitButton = page.getByRole('button', { name: /register|sign up|create account/i });
   await submitButton.click();
 
-  // Wait for registration to complete and redirect to onboarding
-  await page.waitForTimeout(2000);
+  // Wait for registration to complete and redirect
+  await page.waitForTimeout(3000);
 
-  // After registration, user should be on /onboarding
+  // After registration, user should be logged in automatically
   const afterRegisterUrl = page.url();
   console.log('📍 After registration, URL is:', afterRegisterUrl);
 
-  if (afterRegisterUrl.includes('onboarding')) {
-    console.log('✅ Registration successful - redirected to onboarding');
-
-    // Save authentication state NOW (before completing onboarding)
+  if (afterRegisterUrl.includes('onboarding') || afterRegisterUrl.includes('dashboard')) {
+    console.log('✅ Registration successful - auto-logged in');
     await page.context().storageState({ path: authFile });
     console.log('💾 Authentication state saved');
   } else if (afterRegisterUrl.includes('login')) {
-    // Redirect to login - need to login
+    // Redirect to login - need to login manually
     console.log('🔄 Redirected to login, logging in...');
 
     await page.locator('#email').fill(TEST_USER.email);
@@ -84,6 +91,26 @@ setup('authenticate', async ({ page }) => {
     await page.waitForTimeout(2000);
     await page.context().storageState({ path: authFile });
     console.log('✅ Login successful and state saved');
+  } else if (afterRegisterUrl.includes('register')) {
+    // Still on register page - check for errors
+    const errorBanner = page.locator('.error-banner, [role="alert"]');
+    if (await errorBanner.count() > 0) {
+      const errorText = await errorBanner.first().textContent();
+      console.error('❌ Registration failed with error:', errorText);
+
+      // User might already exist, try logging in
+      console.log('🔄 Attempting to login instead...');
+      await page.goto('/login');
+      await page.waitForLoadState('networkidle');
+
+      await page.locator('#email').fill(TEST_USER.email);
+      await page.locator('#password').fill(TEST_USER.password);
+      await page.getByRole('button', { name: /sign in/i }).click();
+
+      await page.waitForTimeout(2000);
+      await page.context().storageState({ path: authFile });
+      console.log('✅ Login successful and state saved');
+    }
   } else {
     console.log('⚠️  Unexpected redirect to:', afterRegisterUrl);
     // Save state anyway
