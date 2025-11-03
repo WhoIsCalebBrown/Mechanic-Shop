@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type {
   OnboardingData,
   BusinessProfile,
@@ -56,6 +56,7 @@ const initialOnboardingData: OnboardingData = {
     phone: '',
     email: '',
     logoUrl: '',
+    country: 'US',
   },
   serviceArea: {
     city: '',
@@ -72,13 +73,23 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
   const [onboardingData, setOnboardingData] = useState<OnboardingData>(initialOnboardingData);
 
   const updateBusinessProfile = (data: Partial<BusinessProfile>) => {
-    setOnboardingData((prev) => ({
-      ...prev,
-      businessProfile: {
+    setOnboardingData((prev) => {
+      const updatedProfile = {
         ...prev.businessProfile,
         ...data,
-      },
-    }));
+      };
+
+      // Auto-sync city and state to service area
+      return {
+        ...prev,
+        businessProfile: updatedProfile,
+        serviceArea: {
+          ...prev.serviceArea,
+          city: updatedProfile.city,
+          state: updatedProfile.state,
+        },
+      };
+    });
   };
 
   const updateServiceArea = (data: Partial<ServiceArea>) => {
@@ -131,12 +142,8 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
           businessProfile.phone.trim()
         );
 
-      case 2: // Service Area
-        return !!(
-          serviceArea.city.trim() &&
-          serviceArea.state.trim() &&
-          serviceArea.radiusMiles > 0
-        );
+      case 2: // Service Area (simplified - only need radius now, city/state from business profile)
+        return serviceArea.radiusMiles > 0;
 
       case 3: // Operating Hours
         // At least one day must be open

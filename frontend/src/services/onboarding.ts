@@ -179,7 +179,7 @@ export function convertOnboardingDataToRequest(data: {
       state: data.businessProfile.state,
       zipCode: data.businessProfile.zipCode,
       phone: data.businessProfile.phone,
-      email: data.businessProfile.email,
+      email: data.businessProfile.email?.trim() || undefined, // Send undefined if empty to avoid validation error
     },
     availability: {
       availabilityRules: {

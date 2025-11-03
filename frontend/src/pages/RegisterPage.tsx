@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { emailValidation, passwordValidation } from '../services/auth';
@@ -29,7 +29,7 @@ export default function RegisterPage() {
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   // Redirect if already authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/onboarding'); // Redirect to onboarding wizard after registration
     }

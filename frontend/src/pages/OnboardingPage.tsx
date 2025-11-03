@@ -1,4 +1,3 @@
-import React from 'react';
 import { OnboardingProvider } from '../contexts/OnboardingContext';
 import OnboardingWizard from '../components/onboarding/OnboardingWizard';
 import './OnboardingPage.css';

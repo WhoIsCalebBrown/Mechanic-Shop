@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import {
   TenantSettingsDto,
@@ -6,8 +6,7 @@ import {
   NotificationSettingsDto,
   AvailabilityRulesDto,
   WeeklyScheduleDto,
-  DayScheduleDto,
-  DateOverrideDto
+  DayScheduleDto
 } from '../generated/api';
 import { tenantSettingsApi } from '../services/api';
 import './TenantSettingsPage.css';
@@ -48,7 +47,7 @@ const TenantSettingsPage = () => {
     setSaveMessage('');
 
     try {
-      const updateDto: UpdateTenantSettingsDto = {
+      const updateDto = {
         name: settings.name,
         businessAddress: settings.businessAddress,
         city: settings.city,
@@ -117,7 +116,7 @@ const TenantSettingsPage = () => {
         ctaTitle: settings.ctaTitle,
         ctaSubtitle: settings.ctaSubtitle,
         ctaButtonText: settings.ctaButtonText
-      };
+      } as UpdateTenantSettingsDto;
 
       const updated = await tenantSettingsApi.update(updateDto);
       setSettings(updated);
@@ -143,7 +142,7 @@ const TenantSettingsPage = () => {
 
   const handleInputChange = (field: keyof TenantSettingsDto, value: any) => {
     if (settings) {
-      setSettings({ ...settings, [field]: value });
+      setSettings({ ...settings, [field]: value } as TenantSettingsDto);
       // Clear error for this field
       if (errors[field]) {
         const newErrors = { ...errors };
@@ -158,8 +157,8 @@ const TenantSettingsPage = () => {
       const notifications = settings.notifications || new NotificationSettingsDto();
       setSettings({
         ...settings,
-        notifications: { ...notifications, [field]: value }
-      });
+        notifications: { ...notifications, [field]: value } as NotificationSettingsDto
+      } as TenantSettingsDto);
     }
   };
 
@@ -177,7 +176,7 @@ const TenantSettingsPage = () => {
             [day]: { ...daySchedule, [field]: value }
           }
         } as AvailabilityRulesDto
-      });
+      } as TenantSettingsDto);
     }
   };
 

@@ -6,6 +6,7 @@ import LoadingScreen from './components/LoadingScreen';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import PublicLandingPage from './pages/PublicLandingPage';
+import PublicBookingPage from './pages/PublicBookingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OnboardingPage from './pages/OnboardingPage';
@@ -90,6 +91,7 @@ function AppContent() {
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/shop/:slug" element={<PublicLandingPage />} />
+        <Route path="/book/:slug" element={<PublicBookingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 

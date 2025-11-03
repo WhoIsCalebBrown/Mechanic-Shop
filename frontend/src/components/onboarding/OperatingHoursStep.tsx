@@ -1,4 +1,3 @@
-import React from 'react';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import type { DayOfWeek } from '../../types';
 import './OnboardingSteps.css';

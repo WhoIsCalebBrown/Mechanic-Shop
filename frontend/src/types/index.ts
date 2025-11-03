@@ -136,6 +136,7 @@ export interface BusinessProfile {
   phone: string;
   email?: string;
   logoUrl?: string;
+  country?: 'US' | 'CA';
 }
 
 export interface ServiceArea {

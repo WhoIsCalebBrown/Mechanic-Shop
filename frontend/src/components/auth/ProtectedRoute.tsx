@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children, requiredRoles }: ProtectedRou
 
   // Show loading screen while checking auth status
   if (isLoading) {
-    return <LoadingScreen />;
+    return <LoadingScreen onComplete={() => {}} />;
   }
 
   // Redirect to login if not authenticated
