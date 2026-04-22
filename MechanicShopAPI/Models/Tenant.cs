@@ -19,6 +19,10 @@ public class Tenant
     public string? Website { get; set; }
     public string? LogoUrl { get; set; }
     public string? Description { get; set; }
+    public string? Timezone { get; set; } = "America/New_York";
+
+    // Branding Settings (stored as JSON in PostgreSQL)
+    public string? BrandingSettings { get; set; } // JSON: { "primaryColor": "#2563eb", "secondaryColor": "#..." }
 
     // Timezone for scheduling (IANA timezone ID, e.g., "America/New_York", "America/Los_Angeles")
     public string TimeZone { get; set; } = "America/New_York"; // Default to EST

@@ -27,15 +27,16 @@ export default function DashboardPage() {
         serviceRecordApi.getAll(),
       ]);
 
+      const isScheduled = (status: string) => status === 'Scheduled' || status === '0';
       const upcoming = appointments
-        .filter((a) => a.status === 'Scheduled' && new Date(a.scheduledDate) > new Date())
+        .filter((a) => isScheduled(String(a.status)) && new Date(a.scheduledDate) > new Date())
         .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
         .slice(0, 5);
 
       setStats({
         customers: customers.length,
         vehicles: vehicles.length,
-        appointments: appointments.filter((a) => a.status === 'Scheduled').length,
+        appointments: appointments.filter((a) => isScheduled(String(a.status))).length,
         serviceRecords: serviceRecords.length,
         upcomingAppointments: upcoming,
       });
@@ -119,6 +120,11 @@ export default function DashboardPage() {
                   <div className="appointment-service">{appointment.serviceType}</div>
                   {appointment.description && (
                     <div className="appointment-description">{appointment.description}</div>
+                  )}
+                  {appointment.customer && (
+                    <div className="appointment-description">
+                      {appointment.customer.firstName} {appointment.customer.lastName}
+                    </div>
                   )}
                 </div>
               </div>

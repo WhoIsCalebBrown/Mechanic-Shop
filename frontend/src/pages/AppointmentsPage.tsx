@@ -48,15 +48,20 @@ export default function AppointmentsPage() {
   };
 
   const getStatusClass = (status: string) => {
-    switch (status) {
+    switch (String(status)) {
       case 'Scheduled':
+      case '0':
         return 'status-scheduled';
       case 'InProgress':
+      case '1':
         return 'status-inprogress';
       case 'Completed':
+      case '2':
         return 'status-completed';
       case 'Cancelled':
       case 'NoShow':
+      case '3':
+      case '4':
         return 'status-cancelled';
       default:
         return '';

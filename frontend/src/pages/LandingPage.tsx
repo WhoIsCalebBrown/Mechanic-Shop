@@ -65,7 +65,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/sitesettings');
+        const response = await fetch('/api/sitesettings');
         const data = await response.json();
         setSettings(data);
       } catch (error) {

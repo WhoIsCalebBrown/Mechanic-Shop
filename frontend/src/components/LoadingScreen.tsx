@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import './LoadingScreen.css';
 
 interface LoadingScreenProps {
-  onComplete: () => void;
+  onComplete?: () => void;
   onExitComplete?: () => void;
   onEnterComplete?: () => void;
 }
@@ -32,7 +32,7 @@ export default function LoadingScreen({ onComplete, onExitComplete, onEnterCompl
     const timer = setTimeout(() => {
       setIsExiting(true);
       // Call onComplete when exit animation starts
-      onComplete();
+      onComplete?.();
       // Call onExitComplete when exit animation is fully done
       setTimeout(() => {
         if (onExitComplete) {

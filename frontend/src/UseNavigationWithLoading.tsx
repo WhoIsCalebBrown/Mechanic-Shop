@@ -5,11 +5,10 @@ import Layout from './components/layout/Layout';
 import LoadingScreen from './components/LoadingScreen';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
-import PublicLandingPage from './pages/PublicLandingPage';
-import PublicBookingPage from './pages/PublicBookingPage';
+import OnboardingPage from './pages/OnboardingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import OnboardingPage from './pages/OnboardingPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
 import TenantSettingsPage from './pages/TenantSettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
@@ -24,7 +23,6 @@ interface NavigationContextType {
 
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useNavigationWithLoading = () => {
   const context = useContext(NavigationContext);
   if (!context) {
@@ -90,8 +88,6 @@ function AppContent() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/shop/:slug" element={<PublicLandingPage />} />
-        <Route path="/book/:slug" element={<PublicBookingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -105,7 +101,19 @@ function AppContent() {
           }
         />
 
-        {/* Protected routes - Tenant settings (Owner/Manager) */}
+        {/* Protected routes - Admin settings (Owner only) */}
+        <Route
+          path="/admin/settings"
+          element={
+            <ProtectedRoute requiredRoles={['Owner']}>
+              <Layout>
+                <AdminSettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected routes - Tenant settings (Owner and Manager) */}
         <Route
           path="/settings"
           element={

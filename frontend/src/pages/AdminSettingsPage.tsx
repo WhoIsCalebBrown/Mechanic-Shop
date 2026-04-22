@@ -70,7 +70,7 @@ const AdminSettingsPage = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/sitesettings');
+      const response = await fetch('/api/sitesettings');
       const data = await response.json();
       setSettings(data);
     } catch (error) {
@@ -89,7 +89,7 @@ const AdminSettingsPage = () => {
     try {
       console.log('Saving settings:', settings);
 
-      const response = await fetch('http://localhost:5000/api/sitesettings', {
+      const response = await fetch('/api/sitesettings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

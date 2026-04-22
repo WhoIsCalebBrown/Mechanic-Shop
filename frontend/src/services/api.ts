@@ -18,7 +18,7 @@ import type {
 } from '../generated/api';
 import { tokenManager, authApi } from './auth';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api';
 
 // Track if we're currently refreshing to avoid multiple refresh calls
 let isRefreshing = false;

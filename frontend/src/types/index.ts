@@ -8,6 +8,16 @@ export interface Customer {
   createdAt: string;
 }
 
+export interface ServiceRecordCustomerSummary {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address?: string;
+  createdAt?: string;
+}
+
 export interface Vehicle {
   id: number;
   customerId: number;
@@ -19,6 +29,8 @@ export interface Vehicle {
   color?: string;
   mileage?: number;
   createdAt: string;
+  customer?: ServiceRecordCustomerSummary;
+  serviceRecords?: ServiceRecord[];
 }
 
 export type AppointmentStatus = 'Scheduled' | 'InProgress' | 'Completed' | 'Cancelled' | 'NoShow';
@@ -34,6 +46,8 @@ export interface Appointment {
   notes?: string;
   createdAt: string;
   completedAt?: string;
+  customer?: Customer;
+  vehicle?: Vehicle;
 }
 
 export interface ServiceRecord {
@@ -49,6 +63,7 @@ export interface ServiceRecord {
   technicianName?: string;
   notes?: string;
   createdAt: string;
+  vehicle?: Vehicle;
 }
 
 // DTOs for creating/updating (without id and timestamps)

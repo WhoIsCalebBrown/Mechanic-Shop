@@ -6,7 +6,62 @@ import type {
   AuthUser,
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = '/api';
+const DEMO_EMAIL = 'demo@precision-auto.com';
+const DEMO_PASSWORD = 'Demo123!';
+
+type RawStaffInfo = {
+  id?: number;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  status?: string;
+  tenantId?: number;
+  tenantSlug?: string;
+  tenantName?: string;
+};
+
+type RawAuthUser = {
+  id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  roles?: string[];
+  staff?: RawStaffInfo | null;
+};
+
+type RawAuthResponse = Omit<AuthResponse, 'user'> & {
+  token?: string;
+  accessToken?: string;
+  user: RawAuthUser;
+};
+
+function getAccessToken(response: { token?: string; accessToken?: string }): string | undefined {
+  return response.token ?? response.accessToken;
+}
+
+function normalizeUser(user: RawAuthUser): AuthUser {
+  const staffRole = user.roles?.[0] ?? user.staff?.role;
+
+  return {
+    id: user.id ?? '',
+    email: user.email ?? '',
+    firstName: user.firstName ?? user.staff?.firstName,
+    lastName: user.lastName ?? user.staff?.lastName,
+    roles: user.roles ?? (staffRole ? [staffRole] : []),
+    tenantId: user.staff?.tenantId,
+    staffId: user.staff?.id,
+  };
+}
+
+function normalizeAuthResponse(response: RawAuthResponse): AuthResponse {
+  const accessToken = getAccessToken(response);
+
+  return {
+    accessToken: accessToken ?? '',
+    user: normalizeUser(response.user),
+  };
+}
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -21,18 +76,14 @@ const TOKEN_KEY = 'auth_token';
 
 export const tokenManager = {
   getToken: (): string | null => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    console.log('[TokenManager] Getting token:', token ? 'Token exists' : 'No token');
-    return token;
+    return localStorage.getItem(TOKEN_KEY);
   },
 
   setToken: (token: string): void => {
-    console.log('[TokenManager] Setting token');
     localStorage.setItem(TOKEN_KEY, token);
   },
 
   removeToken: (): void => {
-    console.log('[TokenManager] Removing token');
     localStorage.removeItem(TOKEN_KEY);
   },
 
@@ -50,31 +101,22 @@ export const tokenManager = {
 // Authentication API
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    console.log('[Auth] Attempting login for:', credentials.email);
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // Include cookies for refresh token
       body: JSON.stringify(credentials),
     });
-    const data = await handleResponse<AuthResponse>(response);
-
-    console.log('[Auth] Login response received:', {
-      hasToken: !!data.accessToken,
-      hasUser: !!data.user,
-      responseKeys: Object.keys(data),
-      fullResponse: data
-    });
+    const data = await handleResponse<RawAuthResponse>(response);
+    const authResponse = normalizeAuthResponse(data);
 
     // Store the access token
-    if (data.accessToken) {
-      console.log('[Auth] Storing token from login response');
-      tokenManager.setToken(data.accessToken);
-    } else {
-      console.error('[Auth] No token in login response! Response:', data);
+    const accessToken = getAccessToken(data);
+    if (accessToken) {
+      tokenManager.setToken(accessToken);
     }
 
-    return data;
+    return authResponse;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
@@ -84,11 +126,13 @@ export const authApi = {
       credentials: 'include', // Include cookies for refresh token
       body: JSON.stringify(data),
     });
-    const authResponse = await handleResponse<AuthResponse>(response);
+    const rawResponse = await handleResponse<RawAuthResponse>(response);
+    const authResponse = normalizeAuthResponse(rawResponse);
 
     // Store the access token
-    if (authResponse.accessToken) {
-      tokenManager.setToken(authResponse.accessToken);
+    const accessToken = getAccessToken(rawResponse);
+    if (accessToken) {
+      tokenManager.setToken(accessToken);
     }
 
     return authResponse;
@@ -120,14 +164,20 @@ export const authApi = {
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include', // Send refresh token cookie
     });
-    const data = await handleResponse<TokenRefreshResponse>(response);
+    const data = await handleResponse<TokenRefreshResponse & { accessToken?: string }>(response);
 
     // Update the access token
-    if (data.accessToken) {
-      tokenManager.setToken(data.accessToken);
+    const accessToken = getAccessToken(data as { token?: string; accessToken?: string });
+    if (accessToken) {
+      tokenManager.setToken(accessToken);
     }
 
     return data;
+  },
+
+  demoCredentials: {
+    email: DEMO_EMAIL,
+    password: DEMO_PASSWORD,
   },
 
   getCurrentUser: async (): Promise<AuthUser> => {
@@ -146,7 +196,8 @@ export const authApi = {
       credentials: 'include',
     });
 
-    return handleResponse<AuthUser>(response);
+    const rawUser = await handleResponse<RawAuthUser>(response);
+    return normalizeUser(rawUser);
   },
 
   // Decode user information from JWT token (client-side only, for display purposes)
@@ -154,33 +205,20 @@ export const authApi = {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
 
-      console.log('[Auth] JWT Payload:', payload);
-
-      // Extract roles from staff_role claim
-      const staffRole = payload.staff_role || payload.role;
-      const roles = staffRole ? (Array.isArray(staffRole) ? staffRole : [staffRole]) : [];
-
-      // Get tenant_id and convert to number if present
-      const tenantIdStr = payload.tenant_id || payload.tenantId;
-      const tenantId = tenantIdStr ? parseInt(tenantIdStr, 10) : undefined;
-
-      // Get staff_id and convert to number if present
-      const staffIdStr = payload.staff_id || payload.staffId;
-      const staffId = staffIdStr ? parseInt(staffIdStr, 10) : undefined;
-
-      console.log('[Auth] Decoded tenantId:', tenantId, 'staffId:', staffId);
+      // Extract role from staff_role claim (which comes from backend as "Owner", "Manager", etc.)
+      const staffRole = payload.staff_role;
+      const roles = staffRole ? [staffRole] : [];
 
       return {
         id: payload.sub || payload.userId,
         email: payload.email,
-        firstName: payload.firstName || payload.given_name,
-        lastName: payload.lastName || payload.family_name,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
         roles: roles,
-        tenantId: tenantId,
-        staffId: staffId,
+        tenantId: typeof payload.tenant_id === 'string' ? parseInt(payload.tenant_id, 10) : payload.tenant_id,
+        staffId: typeof payload.staff_id === 'string' ? parseInt(payload.staff_id, 10) : payload.staff_id,
       };
-    } catch (error) {
-      console.error('Failed to decode token:', error);
+    } catch {
       return null;
     }
   },

@@ -27,6 +27,8 @@ public class MechanicShopContext : IdentityDbContext<ApplicationUser>
     public DbSet<RepairOrder> RepairOrders { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public DbSet<ServiceItem> ServiceItems { get; set; } = null!;
+    public DbSet<NotificationPreferences> NotificationPreferences { get; set; } = null!;
+    public DbSet<HolidayOverride> HolidayOverrides { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -422,6 +424,38 @@ public class MechanicShopContext : IdentityDbContext<ApplicationUser>
                 CtaButtonText = "Book Appointment",
                 UpdatedAt = new DateTime(2025, 10, 30, 0, 0, 0, DateTimeKind.Utc)
             });
+        });
+
+        // Configure NotificationPreferences
+        modelBuilder.Entity<NotificationPreferences>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Tenant relationship - One-to-One
+            entity.HasOne(e => e.Tenant)
+                .WithOne()
+                .HasForeignKey<NotificationPreferences>(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TenantId).IsUnique();
+        });
+
+        // Configure HolidayOverride
+        modelBuilder.Entity<HolidayOverride>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            // Tenant relationship
+            entity.HasOne(e => e.Tenant)
+                .WithMany()
+                .HasForeignKey(e => e.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => new { e.TenantId, e.Date });
         });
     }
 }

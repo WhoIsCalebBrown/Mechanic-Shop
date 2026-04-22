@@ -14,8 +14,8 @@ using MechanicShopAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add multi-tenancy services (Singleton because it uses AsyncLocal for request context)
-builder.Services.AddSingleton<ITenantAccessor, TenantAccessor>();
+// Add multi-tenancy services
+builder.Services.AddScoped<ITenantAccessor, TenantAccessor>();
 
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -141,73 +141,75 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         // Optional: preserve null values
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        // Convert enums to/from strings instead of numbers (e.g., "Scheduled" instead of 0)
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure OpenAPI with NSwag (better TypeScript generation than Swashbuckle)
-builder.Services.AddOpenApiDocument(config =>
+// Configure Swagger with JWT support
+builder.Services.AddSwaggerGen(options =>
 {
-    config.DocumentName = "v1";
-    config.Title = "Mechanic Shop API";
-    config.Version = "v1";
-    config.Description = "API for managing mechanic shop operations";
-
-    // Add JWT authentication to OpenAPI spec
-    config.AddSecurity("Bearer", new NSwag.OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Type = NSwag.OpenApiSecuritySchemeType.Http,
-        Scheme = "bearer",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
         BearerFormat = "JWT",
+        In = ParameterLocation.Header,
         Description = "Enter your JWT token"
     });
 
-    config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.AspNetCoreOperationSecurityScopeProcessor("Bearer"));
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
-// Configure CORS for React frontend + white-label subdomains
+// Configure CORS for React frontend
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
+            policy.WithOrigins(
+                    "http://localhost:5173",
+                    "http://localhost:5174",
+                    "http://localhost:5175",
+                    "http://127.0.0.1:5173",
+                    "http://127.0.0.1:5174",
+                    "http://127.0.0.1:5175",
+                    "http://localhost:3000")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials(); // Required for HTTP-only cookies
         });
-
-    // Public CORS policy for white-label landing pages (supports subdomains)
-    options.AddPolicy("AllowPublicAccess",
-        policy =>
-        {
-            // Allow any origin for public endpoints (no credentials needed)
-            policy.AllowAnyOrigin()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
 });
-
-// Add response caching for public endpoints
-builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
-// Automatically apply migrations
-using (var scope = app.Services.CreateScope())
+// Create schema and seed showcase demo data on startup
+await using (var scope = app.Services.CreateAsyncScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<MechanicShopContext>();
     db.Database.EnsureCreated(); // This will create the database and all tables
+    await DemoDataSeeder.SeedAsync(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Enable OpenAPI/Swagger with NSwag
-    app.UseOpenApi(); // Serves the OpenAPI spec at /swagger/v1/swagger.json
-    app.UseSwaggerUi(); // Serves the Swagger UI at /swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
@@ -215,21 +217,16 @@ app.UseHttpsRedirection();
 // Enable static files for the booking preview page
 app.UseStaticFiles();
 
-// Enable response caching for public endpoints
-app.UseResponseCaching();
-
 app.UseCors("AllowReactApp");
 
 // Add rate limiting middleware (before authentication)
 app.UseRateLimiting();
 
-// Authentication must come before tenant resolution (so JWT claims are available)
-app.UseAuthentication();
-
-// Add tenant resolution middleware (after authentication, before authorization)
+// Add tenant resolution middleware (before authentication)
 app.UseTenantResolution();
 
-// Authorization must come last
+// Authentication must come before authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

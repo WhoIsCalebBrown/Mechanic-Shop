@@ -186,6 +186,18 @@ public class NotificationSettingsDto
     public bool SmsOnServiceComplete { get; set; } = false;
 }
 
+public class NotificationPreferencesDto
+{
+    public bool NewBookingEmail { get; set; } = true;
+    public bool NewBookingSms { get; set; } = false;
+    public bool PaymentReceivedEmail { get; set; } = true;
+    public bool PaymentReceivedSms { get; set; } = false;
+    public bool AppointmentReminderEmail { get; set; } = true;
+    public bool AppointmentReminderSms { get; set; } = false;
+    public bool CancellationEmail { get; set; } = true;
+    public bool CancellationSms { get; set; } = false;
+}
+
 /// <summary>
 /// Weekly availability schedule with override dates
 /// </summary>
@@ -214,6 +226,7 @@ public class WeeklyScheduleDto
 /// </summary>
 public class DayScheduleDto
 {
+    public int DayOfWeek { get; set; }
     public bool IsOpen { get; set; }
     public string? OpenTime { get; set; }  // HH:mm format
     public string? CloseTime { get; set; }  // HH:mm format
@@ -229,4 +242,64 @@ public class DateOverrideDto
     public string? OpenTime { get; set; }
     public string? CloseTime { get; set; }
     public string? Reason { get; set; }  // e.g., "Christmas", "Independence Day"
+}
+
+public class AvailabilitySettingsDto
+{
+    public List<DayScheduleDto> WeeklySchedule { get; set; } = new();
+    public List<HolidayOverrideDto> HolidayOverrides { get; set; } = new();
+}
+
+public class HolidayOverrideDto
+{
+    public int? Id { get; set; }
+    public string Date { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public bool IsClosed { get; set; }
+    public string? OpenTime { get; set; }
+    public string? CloseTime { get; set; }
+}
+
+public class TenantSettingsResponse
+{
+    public int Id { get; set; }
+    public string Slug { get; set; } = string.Empty;
+    public string BusinessName { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string ZipCode { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Timezone { get; set; } = "America/New_York";
+    public BrandingSettingsDto Branding { get; set; } = new();
+    public NotificationPreferencesDto Notifications { get; set; } = new();
+    public AvailabilitySettingsDto Availability { get; set; } = new();
+}
+
+public class UpdateTenantSettingsRequest
+{
+    public string? BusinessName { get; set; }
+    public string? Address { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public string? ZipCode { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public string? Timezone { get; set; }
+    public BrandingSettingsDto? Branding { get; set; }
+    public NotificationPreferencesDto? Notifications { get; set; }
+    public AvailabilitySettingsDto? Availability { get; set; }
+}
+
+public class BrandingSettingsDto
+{
+    public string? LogoUrl { get; set; }
+    public string PrimaryColor { get; set; } = "#2563eb";
+    public string? SecondaryColor { get; set; }
+}
+
+public class LogoUploadResponse
+{
+    public string LogoUrl { get; set; } = string.Empty;
 }

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { authApi, tokenManager } from '../services/auth';
 import type { AuthUser, LoginRequest, RegisterRequest } from '../types';
 
@@ -26,7 +27,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,6 +37,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const token = tokenManager.getToken();
 
       if (!token) {
+        if (import.meta.env.DEV) {
+          try {
+            const response = await authApi.login(authApi.demoCredentials);
+            setUser(response.user);
+          } catch (error) {
+            console.error('Demo login failed:', error);
+            setUser(null);
+          } finally {
+            setIsLoading(false);
+          }
+          return;
+        }
+
         setIsLoading(false);
         return;
       }
@@ -66,63 +80,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const loadUser = async () => {
     try {
-      const token = tokenManager.getToken();
-      if (!token) {
-        console.log('[Auth] No token found');
-        setUser(null);
-        return;
-      }
-
-      console.log('[Auth] Token found, attempting to decode...');
-
-      // Try to decode user from token first (faster, no API call needed)
-      const decodedUser = authApi.decodeToken(token);
-      if (decodedUser && decodedUser.id && decodedUser.email) {
-        console.log('[Auth] User decoded from token:', decodedUser.email);
-        setUser(decodedUser as AuthUser);
-        return;
-      }
-
-      console.log('[Auth] Token decode failed, attempting API call...');
-
-      // Fallback to API call if token decode fails
-      try {
-        const currentUser = await authApi.getCurrentUser();
-        console.log('[Auth] User loaded from API:', currentUser.email);
-        setUser(currentUser);
-      } catch (apiError) {
-        console.warn('[Auth] API call failed, but token exists. Keeping decoded user.', apiError);
-
-        // If API fails but we have a valid token, try to use decoded data anyway
-        if (decodedUser && decodedUser.id) {
-          console.log('[Auth] Using partially decoded user data');
-          setUser(decodedUser as AuthUser);
-          return;
-        }
-
-        throw apiError; // Re-throw if we really can't get user data
-      }
+      const currentUser = await authApi.getCurrentUser();
+      setUser(currentUser);
     } catch (error) {
-      console.error('[Auth] Failed to load user, attempting token refresh:', error);
-
-      // Try token refresh before removing token
-      try {
-        await authApi.refreshToken();
-        const token = tokenManager.getToken();
-        if (token) {
-          const decodedUser = authApi.decodeToken(token);
-          if (decodedUser && decodedUser.id) {
-            console.log('[Auth] User restored after refresh:', decodedUser.email);
-            setUser(decodedUser as AuthUser);
-            return;
-          }
-        }
-      } catch (refreshError) {
-        console.error('[Auth] Token refresh failed, clearing auth state:', refreshError);
-      }
-
-      // Only clear token if all recovery attempts failed
-      console.log('[Auth] All auth recovery attempts failed, logging out');
+      console.error('Failed to load user:', error);
       tokenManager.removeToken();
       setUser(null);
     }
@@ -173,4 +134,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
+}

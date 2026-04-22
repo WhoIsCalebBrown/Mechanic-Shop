@@ -58,38 +58,41 @@ export default function Layout({ children }: LayoutProps) {
             </button>
           </div>
         </div>
-        <ul className="nav-links">
-          <li>
-            <a href="/dashboard" onClick={(e) => handleNavClick(e, '/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
-              Dashboard
-            </a>
-          </li>
-          <li>
-            <a href="/customers" onClick={(e) => handleNavClick(e, '/customers')} className={isActive('/customers') ? 'active' : ''}>
-              Customers
-            </a>
-          </li>
-          <li>
-            <a href="/vehicles" onClick={(e) => handleNavClick(e, '/vehicles')} className={isActive('/vehicles') ? 'active' : ''}>
-              Vehicles
-            </a>
-          </li>
-          <li>
-            <a href="/appointments" onClick={(e) => handleNavClick(e, '/appointments')} className={isActive('/appointments') ? 'active' : ''}>
-              Appointments
-            </a>
-          </li>
-          <li>
-            <a href="/service-records" onClick={(e) => handleNavClick(e, '/service-records')} className={isActive('/service-records') ? 'active' : ''}>
-              Service Records
-            </a>
-          </li>
-          <li>
-            <a href="/settings" onClick={(e) => handleNavClick(e, '/settings')} className={isActive('/settings') ? 'active' : ''}>
-              Settings
-            </a>
-          </li>
-          <li className="user-menu-container">
+        <div className="nav-row">
+          <ul className="nav-links">
+            <li>
+              <a href="/dashboard" onClick={(e) => handleNavClick(e, '/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
+                Dashboard
+              </a>
+            </li>
+            <li>
+              <a href="/customers" onClick={(e) => handleNavClick(e, '/customers')} className={isActive('/customers') ? 'active' : ''}>
+                Customers
+              </a>
+            </li>
+            <li>
+              <a href="/vehicles" onClick={(e) => handleNavClick(e, '/vehicles')} className={isActive('/vehicles') ? 'active' : ''}>
+                Vehicles
+              </a>
+            </li>
+            <li>
+              <a href="/appointments" onClick={(e) => handleNavClick(e, '/appointments')} className={isActive('/appointments') ? 'active' : ''}>
+                Appointments
+              </a>
+            </li>
+            <li>
+              <a href="/service-records" onClick={(e) => handleNavClick(e, '/service-records')} className={isActive('/service-records') ? 'active' : ''}>
+                Service Records
+              </a>
+            </li>
+            <li>
+              <a href="/admin/settings" onClick={(e) => handleNavClick(e, '/admin/settings')} className={isActive('/admin/settings') ? 'active' : ''}>
+                Site Settings
+              </a>
+            </li>
+          </ul>
+
+          <div className="user-menu-container">
             <button
               className="user-menu-trigger"
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -155,8 +158,8 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </div>
             )}
-          </li>
-        </ul>
+          </div>
+        </div>
       </nav>
       {menuOpen && <FullScreenMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />}
       <main className="main-content">
